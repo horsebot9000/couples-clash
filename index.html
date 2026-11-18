@@ -1,0 +1,1996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e0835">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Couple's Clash</title>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{
+  --p0:#ff3d7f; --p1:#2fd6ff; --gold:#ffd23f; --ok:#2ee59d; --bad:#ff4d4d;
+  --deep:#2a0f4a; --deep2:#1a0630; --line:rgba(255,255,255,.14);
+  --bg1:#5a1f8f; --bg2:#1e0835; --bg3:#07010e; --plate1:#d0153a; --plate2:#760720; --hl:#ffd23f;
+  --display: Impact, "Arial Black", "Franklin Gothic Heavy", sans-serif;
+}
+body.spicy{--bg1:#8a0b2e; --bg2:#2a0312; --bg3:#060003; --deep:#3b0b1f; --deep2:#22040f; --plate1:#2a0010; --plate2:#0a0004; --hl:#ff5577}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+html{background:#07010e}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;overflow-x:hidden;min-height:100vh;
+  background:radial-gradient(ellipse at 50% -10%,var(--bg1) 0%,var(--bg2) 48%,var(--bg3) 100%) fixed;transition:background .6s}
+button{font-family:inherit}
+#fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+#burst{position:fixed;inset:0;z-index:60;pointer-events:none}
+.beams{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.beams i{position:absolute;top:-10%;width:36vw;height:130vh;transform-origin:top center;filter:blur(12px);
+  background:linear-gradient(180deg,rgba(255,236,190,.17),rgba(255,236,190,0) 75%);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%)}
+body.spicy .beams i{background:linear-gradient(180deg,rgba(255,80,120,.2),rgba(255,80,120,0) 75%)}
+.beams i:nth-child(1){left:0;animation:sway 9s ease-in-out infinite alternate}
+.beams i:nth-child(2){right:0;animation:sway 11s ease-in-out infinite alternate-reverse}
+.beams i:nth-child(3){left:32vw;width:30vw;opacity:.6;animation:sway 13s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-22deg)}to{transform:rotate(18deg)}}
+.floor{position:fixed;left:-10%;right:-10%;bottom:-30vh;height:60vh;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,210,63,.13),transparent 60%)}
+body.spicy .floor{background:radial-gradient(ellipse at 50% 0%,rgba(255,40,90,.2),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:14px 16px 70px}
+.wrap.shake{animation:shake2 .45s}
+@keyframes shake2{15%,55%{transform:translate(-9px,3px)}35%,75%{transform:translate(9px,-3px)}}
+
+/* top controls */
+.ctrls{position:fixed;top:12px;right:12px;z-index:70;display:flex;gap:8px}
+.ctrls button{background:rgba(0,0,0,.35);backdrop-filter:blur(6px);border:1px solid var(--line);color:#fff;border-radius:12px;width:42px;height:42px;font-size:18px;cursor:pointer;transition:.2s}
+.ctrls button:hover{border-color:var(--gold);transform:translateY(-2px)}
+.ctrls button.off{opacity:.45}
+
+/* marquee */
+.marquee{position:relative;margin:6px auto 2px;width:fit-content;padding:18px 44px;border-radius:20px;
+  background:linear-gradient(var(--plate1),var(--plate2));box-shadow:0 0 0 5px var(--gold),0 0 50px rgba(255,210,63,.35),inset 0 2px 0 rgba(255,255,255,.2);transition:.5s}
+body.spicy .marquee{box-shadow:0 0 0 5px #ff3d6e,0 0 60px rgba(255,40,100,.55),inset 0 2px 0 rgba(255,255,255,.12)}
+.marquee h1{margin:0;font-family:var(--display);font-size:clamp(30px,6.6vw,64px);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
+  background:linear-gradient(100deg,#ffd23f 0%,#ffd23f 40%,#fff8d6 50%,#ffd23f 60%,#ffd23f 100%);background-size:250% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 0 #7a4a00) drop-shadow(0 0 14px rgba(255,210,63,.5));
+  animation:shine 4s linear infinite}
+body.spicy .marquee h1{background-image:linear-gradient(100deg,#ff5f8f 0%,#ff5f8f 40%,#fff 50%,#ff5f8f 60%,#ff5f8f 100%);filter:drop-shadow(0 3px 0 #5a0020) drop-shadow(0 0 16px rgba(255,60,120,.8))}
+@keyframes shine{from{background-position:100% 0}to{background-position:-150% 0}}
+.bulb{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#6e4f0c;animation:chase 1.6s linear infinite}
+body.spicy .bulb{animation-name:chaseR}
+@keyframes chase{0%,30%{background:#fff6c8;box-shadow:0 0 9px 3px #ffd23f}31%,100%{background:#6e4f0c;box-shadow:none}}
+@keyframes chaseR{0%,30%{background:#ffd0dc;box-shadow:0 0 9px 3px #ff3d6e}31%,100%{background:#5a0b20;box-shadow:none}}
+.neon{display:none;position:absolute;right:-14px;bottom:-22px;transform:rotate(-8deg);font:italic 800 26px/1 "Brush Script MT","Segoe Script",cursive;color:#fff;
+  text-shadow:0 0 6px #ff3d6e,0 0 14px #ff3d6e,0 0 30px #ff0055;animation:flicker 4s infinite}
+body.spicy .neon{display:block}
+@keyframes flicker{0%,19%,22%,62%,64%,100%{opacity:1}20%,21%,63%{opacity:.35}}
+.tagline{text-align:center;font-size:13px;letter-spacing:.3em;text-transform:uppercase;opacity:.7;margin:16px 0 16px}
+
+/* scoreboard */
+.board{display:none;grid-template-columns:1fr auto 1fr;gap:14px;margin-bottom:18px}
+.pod{position:relative;border-radius:18px;padding:12px 14px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.02));border:2px solid var(--line);
+  text-align:center;transition:.3s;min-width:0}
+.pname{font-family:var(--display);font-size:clamp(16px,2.6vw,24px);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.score{font-family:"Courier New",ui-monospace,monospace;font-weight:900;font-size:clamp(30px,5vw,50px);line-height:1.1;margin-top:2px}
+#pod0 .pname,#pod0 .score{color:var(--p0)} #pod0 .score{text-shadow:0 0 16px var(--p0)}
+#pod1 .pname,#pod1 .score{color:var(--p1)} #pod1 .score{text-shadow:0 0 16px var(--p1)}
+.pod.active{transform:translateY(-4px) scale(1.04)}
+#pod0.active{border-color:var(--p0);box-shadow:0 0 34px var(--p0),inset 0 0 20px rgba(255,61,127,.25)}
+#pod1.active{border-color:var(--p1);box-shadow:0 0 34px var(--p1),inset 0 0 20px rgba(47,214,255,.25)}
+.pod.bump{animation:bump .5s}
+@keyframes bump{30%{transform:scale(1.1)}}
+.crown{position:absolute;top:-26px;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:30px;opacity:0;transition:.4s;filter:drop-shadow(0 0 8px gold)}
+.pod.leader .crown{opacity:1;animation:crownBob 2s ease-in-out infinite}
+@keyframes crownBob{50%{transform:translateX(-50%) rotate(8deg) translateY(-4px)}}
+.streak{position:absolute;top:8px;right:10px;font-family:var(--display);font-size:15px;color:#ffb03f;text-shadow:0 0 10px #ff6a00;opacity:0;transition:.3s}
+.pod.hot .streak{opacity:1;animation:pulse 1s ease-in-out infinite}
+.roundtag{align-self:center;font-family:var(--display);color:var(--gold);text-align:center;font-size:14px;letter-spacing:.12em;text-transform:uppercase;line-height:1.35}
+.float{position:absolute;left:50%;top:35%;font-family:var(--display);font-size:32px;pointer-events:none;animation:floatUp 1.3s ease-out forwards;text-shadow:0 2px 8px #000}
+@keyframes floatUp{from{opacity:1;transform:translate(-50%,0) scale(1.3)}to{opacity:0;transform:translate(-50%,-70px) scale(1)}}
+
+/* cards */
+.card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid var(--line);
+  border-radius:24px;padding:clamp(18px,3vw,34px);box-shadow:0 30px 80px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18);
+  backdrop-filter:blur(4px);animation:cardIn .55s cubic-bezier(.2,.9,.25,1.1)}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:24px;padding:1px;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,210,63,.6),transparent 30%,transparent 70%,rgba(255,61,127,.5));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.card.rr-pad{padding-top:62px}
+@keyframes cardIn{from{opacity:0;transform:perspective(1200px) rotateX(14deg) translateY(34px) scale(.95);filter:blur(8px)}to{opacity:1;transform:none;filter:none}}
+.center{text-align:center}
+.q{font-size:clamp(22px,3.6vw,34px);font-weight:850;line-height:1.22;margin:0 0 10px;text-align:center;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+.hl{color:var(--hl)}
+.meta{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 0 18px}
+.pips{display:flex;gap:6px}
+.pips i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18);transition:.3s}
+.pips i.done{background:var(--gold)}
+.pips i.cur{background:#fff;box-shadow:0 0 10px #fff;transform:scale(1.25)}
+.chip-pts{font-family:var(--display);font-size:13px;letter-spacing:.1em;background:var(--gold);color:var(--deep);padding:4px 11px;border-radius:99px;white-space:nowrap}
+.chip-pts.dbl{background:var(--bad);color:#fff;animation:pulse 1s ease-in-out infinite}
+.chip-pts.alt{background:rgba(255,255,255,.12);color:#fff}
+.bigtitle{font-family:var(--display);font-size:clamp(44px,9vw,92px);letter-spacing:.04em;text-transform:uppercase;line-height:1;margin:12px 0;
+  background:linear-gradient(#fff6c8,#ffd23f 55%,#ff9f1c);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 5px 0 rgba(0,0,0,.35))}
+body.spicy .bigtitle{background-image:linear-gradient(#ffe0ea,#ff5f8f 55%,#ff1f5a)}
+.lead{font-size:clamp(16px,2.2vw,19px);line-height:1.5;opacity:.92;max-width:680px;margin:10px auto}
+.hint{font-size:12px;opacity:.5;margin-top:10px;text-align:center}
+.c0{color:var(--p0);font-weight:800}.c1{color:var(--p1);font-weight:800}
+.status{margin-top:16px;text-align:center;font-family:var(--display);letter-spacing:.05em;font-size:clamp(18px,3vw,26px);text-transform:uppercase;min-height:1.3em}
+.status .c0,.status .c1{font-weight:400}
+.good{color:var(--ok)} .badc{color:var(--bad)} .goldc{color:var(--gold)}
+
+.btn{position:relative;overflow:hidden;font-family:var(--display);letter-spacing:.08em;text-transform:uppercase;font-size:18px;border:0;border-radius:14px;padding:14px 28px;cursor:pointer;
+  color:var(--deep2);background:linear-gradient(#ffe88f,#ffbf1f);box-shadow:0 5px 0 #a86f00,0 10px 26px rgba(0,0,0,.4),0 0 24px rgba(255,210,63,.25);transition:transform .08s,filter .2s}
+.btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);transition:left .5s}
+.btn:hover::after{left:130%}
+.btn:hover{filter:brightness(1.07)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #a86f00}
+.btn.ghost{background:rgba(255,255,255,.1);color:#fff;box-shadow:none;border:1px solid var(--line)}
+.btn.ghost:hover{background:rgba(255,255,255,.18)}
+.btn.red{background:linear-gradient(#ff7676,#d61f2c);color:#fff;box-shadow:0 5px 0 #7a0d14}
+.btn.small{font-size:14px;padding:9px 16px}
+.btn.huge{font-size:24px;padding:18px 44px}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.reroll{position:absolute;top:14px;right:14px;z-index:3;display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:99px;cursor:pointer;
+  background:rgba(0,0,0,.35);border:2px solid var(--gold);color:var(--gold);font:800 14px system-ui,sans-serif;letter-spacing:.02em;transition:.2s}
+.reroll:hover{background:var(--gold);color:var(--deep2);box-shadow:0 0 18px rgba(255,210,63,.6)}
+.reroll .die{display:inline-block;font-size:18px;transition:transform .5s}
+.reroll:hover .die{transform:rotate(360deg)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:80;background:rgba(0,0,0,.8);border:1px solid var(--gold);
+  color:#fff;padding:12px 20px;border-radius:14px;font-weight:700;transition:.3s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+input[type=text]{font:700 20px system-ui,sans-serif;color:#fff;background:rgba(0,0,0,.35);border:2px solid var(--line);border-radius:12px;padding:14px 16px;width:100%;outline:none;transition:.2s}
+input[type=text]:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(255,210,63,.15)}
+input.secret{-webkit-text-security:disc}
+select{font:600 15px system-ui,sans-serif;color:#fff;background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:5px 8px;margin-left:6px}
+.inrow{display:flex;gap:10px;max-width:560px;margin:16px auto 0}
+.inrow .btn{padding:10px 18px;flex:none}
+.shake-it{animation:shake .4s;border-color:var(--bad)!important}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+@keyframes pulse{50%{transform:scale(1.03)}}
+
+/* overlays */
+#curtain{position:fixed;inset:0;z-index:55;pointer-events:none}
+#curtain .cur{position:absolute;top:0;bottom:0;width:51%;transition:transform .6s cubic-bezier(.7,0,.3,1);
+  background:repeating-linear-gradient(90deg,#5a0612 0,#a3132a 30px,#d01c38 46px,#8a0e22 64px,#5a0612 90px);box-shadow:inset 0 -60px 80px rgba(0,0,0,.5)}
+#curtain .cur::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 20%,transparent 80%,rgba(0,0,0,.5))}
+#curtain .l{left:0;transform:translateX(-102%)}
+#curtain .r{right:0;transform:translateX(102%)}
+#curtain.closed .l,#curtain.closed .r{transform:none}
+#curtain .val{position:absolute;top:0;left:0;right:0;height:54px;background:repeating-linear-gradient(90deg,#7a0a1c 0,#c4142c 22px,#7a0a1c 44px);
+  border-bottom:4px solid var(--gold);box-shadow:0 6px 20px rgba(0,0,0,.6);transform:translateY(-110%);transition:transform .4s}
+#curtain.closed .val{transform:none}
+#flash{position:fixed;inset:0;z-index:58;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.75),rgba(255,255,255,0) 60%)}
+#flash.on{animation:flash .6s ease-out}
+@keyframes flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+#hype{position:fixed;inset:0;z-index:59;pointer-events:none;display:grid;place-items:center}
+#hype span{font-family:var(--display);font-size:clamp(48px,11vw,130px);letter-spacing:.04em;text-transform:uppercase;text-align:center;line-height:.95;opacity:0;padding:0 20px;
+  background:linear-gradient(#fff,#ffd23f 50%,#ff8a00);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 0 rgba(0,0,0,.5)) drop-shadow(0 0 30px rgba(255,180,0,.6))}
+#hype span.bad{background-image:linear-gradient(#fff,#ff7a7a 50%,#c40020);filter:drop-shadow(0 6px 0 rgba(0,0,0,.5)) drop-shadow(0 0 30px rgba(255,0,0,.5))}
+#hype span.on{animation:stamp 1.6s cubic-bezier(.2,1.4,.4,1) forwards}
+@keyframes stamp{0%{opacity:0;transform:scale(2.4) rotate(-8deg)}14%{opacity:1;transform:scale(1) rotate(-4deg)}75%{opacity:1;transform:scale(1.04) rotate(-4deg)}100%{opacity:0;transform:scale(1.2) rotate(-4deg)}}
+#bigx{position:fixed;inset:0;display:none;place-items:center;z-index:57;pointer-events:none}
+#bigx.on{display:grid;animation:xpop .9s ease-out forwards}
+#bigx span{font-family:var(--display);font-size:min(40vw,320px);color:var(--bad);text-shadow:0 0 40px rgba(255,0,0,.8),0 10px 0 #600;letter-spacing:.1em}
+@keyframes xpop{0%{opacity:0;transform:scale(1.6)}15%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0}}
+
+/* setup */
+.sec{font-family:var(--display);font-weight:400;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);font-size:22px;margin:24px 0 12px;text-align:center}
+.sec:first-child{margin-top:0}
+.setup{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+.field input{text-align:center;font-size:22px}
+.field.f0 input{border-color:rgba(255,61,127,.5)} .field.f1 input{border-color:rgba(47,214,255,.5)}
+.field.f0 input:focus{border-color:var(--p0)} .field.f1 input:focus{border-color:var(--p1)}
+.vs{font-family:var(--display);font-size:38px;color:var(--gold);text-shadow:0 0 18px rgba(255,210,63,.6)}
+.heat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:640px;margin:0 auto}
+.heat button{padding:14px 10px;border-radius:16px;border:2px solid var(--line);background:rgba(0,0,0,.25);color:#fff;cursor:pointer;transition:.2s;text-align:center}
+.heat button b{display:block;font-family:var(--display);font-weight:400;letter-spacing:.06em;text-transform:uppercase;font-size:18px;margin-top:4px}
+.heat button small{display:block;font-size:12px;opacity:.75;margin-top:3px}
+.heat button .em{font-size:28px}
+.heat button.on{border-color:var(--gold);background:rgba(255,210,63,.12);box-shadow:0 0 22px rgba(255,210,63,.3)}
+.heat button[data-h=spicy].on,.heat button[data-h=mixed].on{border-color:#ff3d6e;background:rgba(255,40,100,.15);box-shadow:0 0 26px rgba(255,40,100,.45)}
+.heatnote{text-align:center;font-size:13px;opacity:.7;margin-top:8px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;text-align:left}
+.rcard{position:relative;background:rgba(0,0,0,.25);border:2px solid var(--line);border-radius:18px;padding:14px 14px 12px 60px;cursor:pointer;transition:.2s;opacity:.5;user-select:none}
+.rcard:hover{opacity:.85;transform:translateY(-2px)}
+.rcard.on{opacity:1;border-color:var(--gold);background:linear-gradient(135deg,rgba(255,210,63,.12),rgba(0,0,0,.2))}
+.rcard .rem{position:absolute;left:12px;top:12px;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:rgba(255,255,255,.08);transition:.2s}
+.rcard.on .rem{background:var(--gold);box-shadow:0 0 14px rgba(255,210,63,.5)}
+.rcard b{display:block;font-family:var(--display);font-weight:400;letter-spacing:.06em;color:var(--gold);text-transform:uppercase;font-size:17px}
+.rcard p{margin:4px 0 10px;font-size:13.5px;opacity:.88;line-height:1.4}
+.rcard .ro{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:13px;opacity:.92}
+.rcard .only{margin-left:auto;background:none;border:1px solid var(--line);color:#fff;border-radius:99px;padding:4px 10px;font-size:12px;cursor:pointer;opacity:.8}
+.rcard .only:hover{border-color:var(--gold);opacity:1}
+
+/* round intro */
+.intro{text-align:center;padding-top:34px}
+.medal-r{width:120px;height:120px;margin:0 auto;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:radial-gradient(circle at 35% 30%,#fff6c8,#ffd23f 45%,#b37a00 100%);box-shadow:0 0 0 6px rgba(255,210,63,.25),0 0 50px rgba(255,210,63,.5);animation:spinIn .9s cubic-bezier(.2,1.3,.4,1)}
+body.spicy .medal-r{background:radial-gradient(circle at 35% 30%,#ffe0ea,#ff3d6e 45%,#7a0020 100%);box-shadow:0 0 0 6px rgba(255,61,110,.25),0 0 50px rgba(255,40,100,.6)}
+.medal-r span{font-family:var(--display);font-size:64px;color:var(--deep2);line-height:1}
+.medal-r small{position:absolute;bottom:16px;font:800 11px system-ui;letter-spacing:.1em;color:var(--deep2);opacity:.75}
+.medal-r .rem2{position:absolute;top:-14px;right:-14px;font-size:40px;animation:bob 2s ease-in-out infinite}
+@keyframes spinIn{from{transform:rotateY(540deg) scale(.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes bob{50%{transform:translateY(-8px) rotate(10deg)}}
+.intro .bigtitle{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:inherit}
+.intro .bigtitle span{display:inline-block;animation:drop .6s cubic-bezier(.2,1.5,.4,1) both;background:linear-gradient(#fff6c8,#ffd23f 55%,#ff9f1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+body.spicy .intro .bigtitle span{background-image:linear-gradient(#ffe0ea,#ff5f8f 55%,#ff1f5a)}
+@keyframes drop{from{opacity:0;transform:translateY(-60px) rotate(-10deg)}}
+.rules-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.rules-chips span{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:13px;font-weight:700}
+.spicytag{display:inline-block;margin-top:6px;padding:4px 12px;border-radius:99px;background:rgba(255,40,100,.2);border:1px solid #ff3d6e;font-weight:800;font-size:13px}
+
+/* look away */
+.lookaway{margin:4px auto 14px;max-width:560px;text-align:center;font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;
+  font-size:clamp(20px,3.4vw,30px);padding:14px;border-radius:14px;animation:pulse 1.2s ease-in-out infinite}
+.bg0{background:repeating-linear-gradient(45deg,rgba(255,61,127,.35) 0 14px,rgba(255,61,127,.15) 14px 28px);border:2px solid var(--p0)}
+.bg1{background:repeating-linear-gradient(45deg,rgba(47,214,255,.32) 0 14px,rgba(47,214,255,.12) 14px 28px);border:2px solid var(--p1)}
+.lockedmsg{text-align:center;font-size:15px;opacity:.85;margin-bottom:6px}
+
+/* know me */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.flip{perspective:900px;height:160px}
+.flip .inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.3,1.4,.5,1);transform-style:preserve-3d}
+.flip.show .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;text-align:center}
+.front{background:repeating-linear-gradient(45deg,#3a1466 0 12px,#2a0f4a 12px 24px);border:2px solid var(--gold);font-family:var(--display);font-size:54px;color:var(--gold)}
+body.spicy .front{background:repeating-linear-gradient(45deg,#4a0a22 0 12px,#300616 12px 24px)}
+.back{transform:rotateY(180deg);background:var(--deep);border:2px solid}
+.back.b0{border-color:var(--p0);box-shadow:0 0 22px rgba(255,61,127,.4)}
+.back.b1{border-color:var(--p1);box-shadow:0 0 22px rgba(47,214,255,.4)}
+.who{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+.ans{font-size:clamp(18px,2.8vw,26px);font-weight:800;word-break:break-word}
+#judgeq{transition:opacity .4s}
+
+/* top list */
+.listin{max-width:520px;margin:12px auto 0;display:grid;gap:10px}
+.listin label{display:flex;align-items:center;gap:10px}
+.listin .rk{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:20px;background:var(--gold);color:var(--deep)}
+.listin input{padding:10px 14px;font-size:18px}
+.fboard{max-width:620px;margin:6px auto 0;padding:14px;border-radius:20px;background:linear-gradient(#0b2a7a,#06164a);
+  border:4px solid var(--gold);box-shadow:0 0 30px rgba(255,210,63,.3),inset 0 0 30px rgba(0,0,0,.5);display:grid;gap:8px}
+body.spicy .fboard{background:linear-gradient(#5a0626,#2a0010)}
+.tile{perspective:800px;height:60px}
+.tile .inner{position:relative;height:100%;transition:transform .6s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+.tile.show .inner{transform:rotateX(180deg)}
+.tile .tf,.tile .tb{position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;align-items:center}
+.tile .tf{justify-content:center;background:linear-gradient(#2a5ae0,#123a9e);border:2px solid #6f95ff}
+body.spicy .tile .tf{background:linear-gradient(#c4144a,#7a0a2c);border-color:#ff7aa0}
+.tile .tf .num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.6);font-family:var(--display);font-size:22px}
+.tile .tb{transform:rotateX(180deg);background:linear-gradient(#3a6af0,#1a46b8);border:2px solid #fff;padding:0 8px 0 18px;justify-content:space-between;gap:10px}
+body.spicy .tile .tb{background:linear-gradient(#ff3d6e,#a3133e)}
+.tile .txt{font-family:var(--display);font-size:clamp(17px,2.6vw,24px);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .tp{flex:none;min-width:58px;height:44px;display:grid;place-items:center;border-radius:8px;background:rgba(0,0,0,.4);font-family:var(--display);font-size:22px;color:var(--gold)}
+.tile.missed .tb{background:linear-gradient(#4a4a5e,#2a2a3a);border-color:#888}
+.tile.missed .tp{color:#999}
+.strikes{display:flex;justify-content:center;gap:10px;margin:14px 0 4px}
+.strikes span{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-size:30px;border:3px solid rgba(255,77,77,.3);color:rgba(255,77,77,.25)}
+.strikes span.on{border-color:var(--bad);color:var(--bad);background:rgba(255,77,77,.12);box-shadow:0 0 16px rgba(255,77,77,.5)}
+.judgebox{max-width:640px;margin:14px auto 0;padding:14px;border-radius:14px;background:rgba(0,0,0,.35);border:2px dashed var(--gold);text-align:center}
+.judgebox .row{margin-top:10px}
+.judgebox .btn{font-size:15px;padding:10px 16px}
+.judgebox .pk{display:none;text-transform:none;font-family:system-ui,sans-serif;font-weight:700;letter-spacing:0}
+.judgebox.peeking .pk{display:inline}
+.linkbtn{background:none;border:1px dashed rgba(255,255,255,.35);color:#fff;opacity:.8;border-radius:99px;padding:6px 14px;font:600 13px system-ui,sans-serif;cursor:pointer}
+.linkbtn:hover{opacity:1;border-color:var(--gold)}
+
+/* rank it */
+.rk-wrap{max-width:560px;margin:4px auto 0}
+.rk-end{font-family:var(--display);letter-spacing:.12em;text-transform:uppercase;font-size:14px;opacity:.85;margin:8px 0 8px 2px}
+.rk{--h:66px;--g:10px;--rail:58px;position:relative;height:calc(var(--n)*(var(--h) + var(--g)) - var(--g))}
+.rk.compact{--h:48px;--g:7px;--rail:50px}
+.rk-slot{position:absolute;left:0;right:0;top:calc(var(--k)*(var(--h) + var(--g)));height:var(--h);display:flex;align-items:center;gap:12px;--hue:calc(45 + var(--t)*230)}
+body.spicy .rk-slot,body.spicy .rk-tile{--hue:calc(350 - var(--t)*80)}
+.rk-badge{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:22px;color:#1a0630;
+  background:radial-gradient(circle at 35% 30%,hsl(var(--hue) 100% 85%),hsl(var(--hue) 85% 58%) 60%,hsl(var(--hue) 70% 38%));box-shadow:0 0 14px hsla(var(--hue),90%,60%,.45)}
+.rk.compact .rk-badge{width:36px;height:36px;font-size:17px}
+.rk-hole{flex:1;height:100%;border-radius:16px;border:2px dashed rgba(255,255,255,.12);background:rgba(0,0,0,.18)}
+.rk-tile{--hue:calc(45 + var(--t)*230);position:absolute;left:var(--rail);right:0;top:0;height:var(--h);display:flex;align-items:center;gap:12px;padding:0 8px 0 14px;
+  border-radius:16px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;z-index:1;
+  background:linear-gradient(100deg,hsla(var(--hue),90%,58%,.55),hsla(var(--hue),70%,30%,.55) 45%,rgba(30,8,55,.97) 75%);
+  border:2px solid hsl(var(--hue) 85% 65%);box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25);
+  transition:top .26s cubic-bezier(.2,.9,.25,1),opacity .3s,transform .18s,box-shadow .18s,border-color .26s}
+.rk-tile.drag{cursor:grabbing;z-index:10;transform:scale(1.04) rotate(-.8deg);transition:transform .18s,box-shadow .18s,border-color .26s;
+  box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 26px hsla(var(--hue),90%,60%,.6)}
+.rk-emo{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:26px;background:rgba(0,0,0,.28)}
+.rk-emo:empty{display:none}
+.rk.compact .rk-emo{width:32px;height:32px;font-size:19px}
+.rk-txt{flex:1;min-width:0;font-weight:800;font-size:clamp(16px,2.4vw,21px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.rk.compact .rk-txt{font-size:16px}
+.rk-arrows{display:flex;flex-direction:column;gap:3px}
+.rk-arrows button{width:30px;height:24px;border-radius:7px;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:10px;cursor:pointer}
+.rk.compact .rk-arrows button{height:19px}
+.rk-arrows button:hover{background:rgba(255,255,255,.28)}
+.rk-grip{font-size:22px;opacity:.55;padding:0 4px}
+.rr-wrap{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);max-width:720px;margin:6px auto 0}
+.rr-h{text-align:center;font-family:var(--display);font-weight:400;letter-spacing:.08em;text-transform:uppercase;font-size:15px;margin-bottom:10px}
+.rr-body{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);position:relative}
+.rr-col{display:grid;gap:10px}
+.rr-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.rr-svg path{fill:none;stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(0,0,0,.6))}
+.rr-svg path.grow{stroke-dasharray:1;stroke-dashoffset:1;animation:grow .45s ease-out forwards}
+@keyframes grow{to{stroke-dashoffset:0}}
+.rr{height:58px;display:flex;align-items:center;gap:10px;padding:0 12px 0 8px;border-radius:14px;background:var(--deep);border:2px solid rgba(255,255,255,.18);transition:.3s}
+.rr-n{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--deep);font-family:var(--display);font-size:16px}
+.rr .rk-emo{width:36px;height:36px;font-size:21px}
+.rr-t{flex:1;min-width:0;font-weight:800;font-size:clamp(14px,2.1vw,18px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rr.hidden{background:repeating-linear-gradient(45deg,#3a1466 0 10px,#2a0f4a 10px 20px);border-color:var(--gold)}
+.rr.hidden .rr-t{font-family:var(--display);color:var(--gold);font-size:24px}
+.rr-flip{perspective:700px;height:58px}
+.rr-in{position:relative;height:100%;transition:transform .55s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+.rr-flip.show .rr-in{transform:rotateX(180deg)}
+.rr-in>.rr{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.rr-in>.rr.back{transform:rotateX(180deg)}
+.rr .chip{flex:none;font-family:var(--display);font-size:15px;letter-spacing:.04em;padding:3px 8px;border-radius:8px;display:none}
+.rr.hit,.rr.near,.rr.miss{transform:scale(1.02)}
+.rr.hit{border-color:var(--ok);background:linear-gradient(90deg,#0d5a3c,var(--deep))}
+.rr.near{border-color:var(--gold);background:linear-gradient(90deg,#5a470d,var(--deep))}
+.rr.miss{border-color:var(--bad);background:linear-gradient(90deg,#5a0f1a,var(--deep))}
+.rr-in>.rr.back.hit,.rr-in>.rr.back.near,.rr-in>.rr.back.miss{transform:rotateX(180deg)}
+.rr.hit .chip{display:block;background:var(--ok);color:#06301f}
+.rr.near .chip{display:block;background:var(--gold);color:var(--deep)}
+.rr.miss .chip{display:block;background:var(--bad);color:#fff}
+.verdict{text-align:center;margin-top:14px}
+.verdict .big{font-family:var(--display);font-size:clamp(28px,5vw,46px);letter-spacing:.04em;text-transform:uppercase}
+
+/* same page */
+.sublabel{font-size:17px;text-align:center;margin:16px 0 8px;opacity:.95;font-weight:700}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px;margin:0 auto}
+.ch-btn{padding:18px 14px;border-radius:16px;background:var(--deep);border:2px solid rgba(255,255,255,.2);color:#fff;font:800 clamp(16px,2.4vw,21px)/1.25 system-ui,sans-serif;cursor:pointer;transition:.18s}
+.ch-btn:hover{border-color:rgba(255,210,63,.6);transform:translateY(-2px)}
+.ch-btn.sel{border-color:var(--gold);background:linear-gradient(#6a520e,var(--deep));box-shadow:0 0 20px rgba(255,210,63,.45)}
+.ch-btn.n0.sel{border-color:var(--p0);background:linear-gradient(rgba(255,61,127,.45),var(--deep));box-shadow:0 0 20px rgba(255,61,127,.5)}
+.ch-btn.n1.sel{border-color:var(--p1);background:linear-gradient(rgba(47,214,255,.4),var(--deep));box-shadow:0 0 20px rgba(47,214,255,.5)}
+.ch-btn.big{padding:30px 14px;font-size:clamp(20px,3.4vw,30px);font-family:var(--display);font-weight:400;letter-spacing:.05em;text-transform:uppercase}
+.sp-res{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:680px;margin:10px auto 0}
+.sp-card{border-radius:16px;padding:16px;background:rgba(0,0,0,.3);border:2px solid var(--line);text-align:center;opacity:0;transform:translateY(10px) scale(.97);transition:.4s}
+.sp-card.in{opacity:1;transform:none}
+.sp-card.v0{border-color:var(--p0)} .sp-card.v1{border-color:var(--p1)}
+.spk{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.7;margin-top:10px}
+.spk:first-child{margin-top:0}
+.spv{font-weight:800;font-size:clamp(17px,2.6vw,22px);margin-top:3px}
+.spv.pred{opacity:0;transition:.4s}
+.spv.pred.in{opacity:1}
+.spv.big{font-family:var(--display);font-weight:400;font-size:clamp(26px,4.4vw,38px);letter-spacing:.04em;text-transform:uppercase}
+
+/* pick three */
+.p3slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:660px;margin:6px auto 14px}
+.p3slot{min-height:74px;border-radius:16px;border:2px dashed rgba(255,255,255,.3);background:rgba(0,0,0,.25);color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;transition:.2s}
+.p3slot .medal{font-size:26px;line-height:1}
+.p3slot .st{font-weight:800;font-size:15px;opacity:.6;text-align:center}
+.p3slot.on{border-style:solid;border-color:var(--c);background:linear-gradient(180deg,color-mix(in srgb,var(--c) 30%,transparent),rgba(0,0,0,.3));box-shadow:0 0 18px color-mix(in srgb,var(--c) 45%,transparent);animation:pop2 .3s}
+.p3slot.on .st{opacity:1}
+@keyframes pop2{50%{transform:scale(1.06)}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:760px;margin:0 auto}
+.chip{padding:10px 15px;border-radius:99px;border:2px solid rgba(255,255,255,.2);background:var(--deep);color:#fff;font:700 15px system-ui,sans-serif;cursor:pointer;transition:.15s;display:inline-flex;gap:6px;align-items:center}
+.chip:hover{border-color:rgba(255,255,255,.55);transform:translateY(-2px)}
+.chip.sel{border-color:var(--c);background:color-mix(in srgb,var(--c) 35%,var(--deep));box-shadow:0 0 14px color-mix(in srgb,var(--c) 50%,transparent)}
+.chip.add{border-style:dashed;border-color:var(--gold);color:var(--gold);background:transparent}
+.chip.real{border-color:var(--ok);background:rgba(46,229,157,.18)}
+.chip.wrong{border-color:var(--bad);background:rgba(255,77,77,.18);text-decoration:line-through;opacity:.85}
+.chip.dim{opacity:.35}
+.p3custom{display:flex;justify-content:center;margin-top:12px}
+.p3custom .inrow{margin:0}
+.p3rev{max-width:700px;margin:0 auto;display:grid;gap:14px}
+.p3row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.p3lab{text-align:center;font-weight:800;margin-bottom:-6px}
+.p3card{border-radius:16px;min-height:86px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px;
+  background:var(--deep);border:2px solid rgba(255,255,255,.2);transition:.35s;position:relative}
+.p3card .medal{font-size:24px}
+.p3card .t{font-weight:800;font-size:16px}
+.p3card .chip2{font-family:var(--display);font-size:14px;padding:2px 8px;border-radius:8px;margin-top:2px;display:none}
+.p3card.hidden .t{opacity:0}
+.p3card.hidden{background:repeating-linear-gradient(45deg,#3a1466 0 10px,#2a0f4a 10px 20px);border-color:var(--gold)}
+body.spicy .p3card.hidden{background:repeating-linear-gradient(45deg,#4a0a22 0 10px,#300616 10px 20px)}
+.p3card.flipin{animation:flipX .5s}
+@keyframes flipX{0%{transform:rotateY(90deg)}100%{transform:none}}
+.p3card.exact{border-color:var(--gold);background:linear-gradient(#5a470d,var(--deep));box-shadow:0 0 22px rgba(255,210,63,.5)}
+.p3card.hit{border-color:var(--ok);background:linear-gradient(#0d5a3c,var(--deep))}
+.p3card.miss{border-color:var(--bad);background:linear-gradient(#5a0f1a,var(--deep))}
+.p3card.exact .chip2{display:block;background:var(--gold);color:var(--deep)}
+.p3card.hit .chip2{display:block;background:var(--ok);color:#06301f}
+.p3card.miss .chip2{display:block;background:var(--bad);color:#fff}
+
+/* fib */
+.fibin{max-width:560px;margin:10px auto 0;display:grid;gap:10px}
+.fibin label{display:flex;align-items:center;gap:10px}
+.fibin .tg{flex:none;width:86px;font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;font-size:15px;text-align:right}
+.fibin .tg.t{color:var(--ok)} .fibin .tg.f{color:#ff9a9a}
+.fibs{display:grid;gap:12px;max-width:640px;margin:8px auto 0}
+.fibcard{position:relative;display:flex;align-items:center;gap:14px;padding:18px;border-radius:16px;background:var(--deep);border:2px solid rgba(255,255,255,.2);
+  color:#fff;font:800 clamp(17px,2.6vw,22px)/1.3 system-ui,sans-serif;cursor:pointer;text-align:left;transition:.2s;overflow:hidden}
+.fibcard .ltr{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-weight:400;background:var(--gold);color:var(--deep)}
+.fibcard:hover{border-color:rgba(255,210,63,.6)}
+.fibcard.sel{border-color:var(--c);box-shadow:0 0 22px color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 22%,var(--deep))}
+.fibcard .stamp{position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(-12deg) scale(2);opacity:0;font-family:var(--display);font-size:28px;letter-spacing:.1em;
+  padding:2px 12px;border:4px solid;border-radius:8px;transition:.35s cubic-bezier(.2,1.5,.4,1)}
+.fibcard.isfib .stamp{opacity:1;transform:translateY(-50%) rotate(-12deg) scale(1);color:var(--bad);border-color:var(--bad)}
+.fibcard.istruth .stamp{opacity:1;transform:translateY(-50%) rotate(-12deg) scale(1);color:var(--ok);border-color:var(--ok)}
+.fibcard.isfib{opacity:.6}
+.fibcard.istruth{border-color:var(--ok);box-shadow:0 0 28px rgba(46,229,157,.5);opacity:1}
+
+/* draft */
+.turnbar{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 14px;font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;font-size:clamp(20px,3.2vw,28px)}
+.turnbar .dot{width:16px;height:16px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);animation:pulse .8s ease-in-out infinite}
+.turnbar .cnt{font-family:system-ui;font-size:14px;letter-spacing:0;text-transform:none;opacity:.7}
+.dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:720px;margin:0 auto}
+.dcard{position:relative;min-height:62px;padding:12px 14px;border-radius:14px;border:2px solid rgba(255,255,255,.2);background:var(--deep);color:#fff;font:800 clamp(15px,2.3vw,19px)/1.25 system-ui,sans-serif;
+  cursor:pointer;text-align:left;transition:.2s;display:flex;align-items:center;gap:10px}
+.dcard:hover:not(:disabled){border-color:var(--c);box-shadow:0 0 16px color-mix(in srgb,var(--c) 50%,transparent);transform:translateY(-2px)}
+.dcard:disabled{cursor:default}
+.dcard.own0{border-color:var(--p0);background:linear-gradient(90deg,rgba(255,61,127,.35),var(--deep));animation:pop2 .35s}
+.dcard.own1{border-color:var(--p1);background:linear-gradient(90deg,rgba(47,214,255,.3),var(--deep));animation:pop2 .35s}
+.dcard .pk{margin-left:auto;flex:none;font-family:var(--display);font-weight:400;font-size:13px;padding:3px 8px;border-radius:8px;background:rgba(0,0,0,.4)}
+.dlist{max-width:640px;margin:0 auto;display:grid;gap:8px}
+.drow{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:var(--deep);border:2px solid rgba(255,255,255,.15);opacity:0;transform:translateX(-20px);transition:.4s}
+.drow.in{opacity:1;transform:none}
+.drow .rn{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:18px;background:var(--gold);color:var(--deep)}
+.drow .t{flex:1;font-weight:800;font-size:clamp(15px,2.3vw,19px);min-width:0}
+.drow .own{flex:none;font-family:var(--display);font-size:14px;letter-spacing:.04em;padding:4px 10px;border-radius:8px}
+.drow.o0{border-color:var(--p0);background:linear-gradient(90deg,rgba(255,61,127,.28),var(--deep) 70%)} .drow.o0 .own{background:var(--p0)}
+.drow.o1{border-color:var(--p1);background:linear-gradient(90deg,rgba(47,214,255,.25),var(--deep) 70%)} .drow.o1 .own{background:var(--p1);color:#032}
+.drow .pts{flex:none;font-family:var(--display);font-size:20px;color:var(--gold);min-width:52px;text-align:right}
+.dcols{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px;margin:0 auto}
+.dcols h3{margin:0 0 8px;text-align:center;font-family:var(--display);font-weight:400;letter-spacing:.08em;text-transform:uppercase}
+.dcols .dlist{gap:8px}
+
+/* scale */
+.dialwrap{max-width:640px;margin:10px auto 0;text-align:center}
+.bignum{font-family:"Courier New",monospace;font-weight:900;font-size:clamp(64px,12vw,110px);line-height:1;color:var(--c);text-shadow:0 0 24px var(--c)}
+input[type=range].dial{-webkit-appearance:none;appearance:none;width:100%;height:48px;background:transparent;margin:10px 0 4px;cursor:pointer;touch-action:none}
+input[type=range].dial::-webkit-slider-runnable-track{height:18px;border-radius:99px;background:linear-gradient(90deg,#3a1466,#8a3ad0,var(--gold))}
+input[type=range].dial::-moz-range-track{height:18px;border-radius:99px;background:linear-gradient(90deg,#3a1466,#8a3ad0,var(--gold))}
+body.spicy input[type=range].dial::-webkit-slider-runnable-track{background:linear-gradient(90deg,#3a0616,#c4144a,#ff9a3d)}
+body.spicy input[type=range].dial::-moz-range-track{background:linear-gradient(90deg,#3a0616,#c4144a,#ff9a3d)}
+input[type=range].dial::-webkit-slider-thumb{-webkit-appearance:none;width:46px;height:46px;border-radius:50%;background:#fff;border:6px solid var(--c);margin-top:-14px;box-shadow:0 0 18px var(--c)}
+input[type=range].dial::-moz-range-thumb{width:34px;height:34px;border-radius:50%;background:#fff;border:6px solid var(--c);box-shadow:0 0 18px var(--c)}
+.ends{display:flex;justify-content:space-between;font-size:14px;opacity:.8;gap:20px}
+.ends b{font-family:var(--display);font-weight:400;letter-spacing:.04em;display:block;font-size:13px;opacity:.7}
+.ends div:last-child{text-align:right}
+.nudge{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.nudge .btn{padding:8px 14px;font-size:15px}
+.meter{position:relative;height:150px;margin:20px 8px 6px}
+.meter .track{position:absolute;left:0;right:0;top:66px;height:18px;border-radius:99px;background:linear-gradient(90deg,#3a1466,#8a3ad0,var(--gold))}
+.band{position:absolute;top:58px;height:34px;border-radius:8px;opacity:0;transition:opacity .5s}
+.band.on{opacity:1}
+.band.b20{background:rgba(255,255,255,.12)} .band.b10{background:rgba(46,229,157,.25)} .band.b3{background:rgba(255,210,63,.55)}
+.mk{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;transition:left 1.6s cubic-bezier(.2,.8,.2,1)}
+.mk .lbl{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.mk .val{font-family:"Courier New",monospace;font-weight:900;font-size:30px;line-height:1}
+.mk .stem{width:4px;height:22px;border-radius:2px}
+.mk.top{top:0} .mk.bot{top:84px;flex-direction:column-reverse} .mk.hide{opacity:0}
+.ticks{display:flex;justify-content:space-between;font-size:11px;opacity:.5;margin:0 8px}
+
+/* results */
+.trophy{font-size:90px;animation:spinIn 1s cubic-bezier(.2,1.3,.4,1),bob 2.4s 1s ease-in-out infinite;filter:drop-shadow(0 0 30px gold)}
+.finals{display:flex;justify-content:center;gap:40px;margin:10px 0 4px;font-family:var(--display);font-size:24px;letter-spacing:.04em}
+.finals div span{display:block;font-family:"Courier New",monospace;font-weight:900;font-size:48px}
+.recap{max-width:640px;margin:18px auto 0;display:grid;gap:8px;text-align:left}
+.recap .rrow{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;font-size:14px}
+.recap .rname{font-weight:800;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recap .bars{display:grid;gap:3px}
+.recap .bar{height:12px;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1);position:relative}
+.recap .bar.b0{background:linear-gradient(90deg,var(--p0),#ff9ab9)} .recap .bar.b1{background:linear-gradient(90deg,var(--p1),#a8efff)}
+.recap .bar em{position:absolute;left:calc(100% + 6px);top:-3px;font-style:normal;font-size:12px;font-weight:800;white-space:nowrap}
+
+@media (max-width:640px){
+  .setup{grid-template-columns:1fr}
+  .vs{text-align:center}
+  .heat{grid-template-columns:1fr}
+  .board{gap:8px}
+  .roundtag{font-size:11px}
+  .marquee{padding:14px 22px}
+  .flip{height:140px}
+  .finals{gap:20px}
+  .duo,.choice,.sp-res,.dcols{grid-template-columns:1fr}
+  .dgrid{grid-template-columns:1fr}
+  .rk{--h:58px;--rail:50px}
+  .rk-badge{width:40px;height:40px;font-size:19px}
+  .rk-emo{width:36px;height:36px;font-size:22px}
+  .rr-wrap,.rr-body{grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr)}
+  .rr{padding:0 6px;gap:6px}
+  .rr .rk-emo{display:none}
+  .p3row,.p3slots{grid-template-columns:repeat(3,1fr);gap:6px}
+  .p3slot{min-height:62px;padding:6px}
+  .p3slot .st{font-size:12px}
+  .p3card{min-height:74px;padding:6px}
+  .p3card .t{font-size:13px}
+  .chip{padding:8px 12px;font-size:14px}
+  .ctrls{top:auto;bottom:10px;right:10px}
+  .ctrls button{width:36px;height:36px;font-size:15px}
+  .neon{font-size:20px;right:-6px;bottom:-18px}
+  .reroll{top:10px;right:10px;padding:6px 11px;font-size:13px}
+  .recap .rrow{grid-template-columns:100px 1fr}
+  .card.rr-pad{padding-top:64px}
+  .fibin .tg{width:64px;font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ===== PvP / mobile additions ===== */
+body{-webkit-tap-highlight-color:transparent}
+.wrap{max-width:760px;padding:10px 12px 90px}
+.marquee{padding:12px 26px}
+.marquee h1{font-size:clamp(26px,8vw,52px)}
+.tagline{margin:12px 0 12px;font-size:11px}
+.board{gap:8px;margin-bottom:12px}
+.pod{padding:8px 10px;border-radius:16px}
+.pname{font-size:clamp(14px,4vw,20px)}
+.score{font-size:clamp(26px,8vw,42px)}
+.pod .you{display:block;font:800 10px system-ui;letter-spacing:.14em;opacity:.65;margin-top:1px}
+.pod .st{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font:700 10px system-ui;white-space:nowrap;opacity:.8}
+.pod .st.ok{color:var(--ok)} .pod .st.wait{color:var(--gold)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 8px}
+.netpill{position:static;padding:6px 10px;border-radius:99px;font:800 12px system-ui;background:rgba(0,0,0,.5);border:1px solid var(--line);display:flex;gap:6px;align-items:center}
+.netpill i{width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 8px var(--bad)}
+.netpill.on i{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.ctrls,.ctrls[class]{position:static!important;display:flex;gap:6px}
+.ctrls button{width:36px!important;height:36px!important;font-size:15px!important}
+.card{padding:clamp(16px,4vw,30px)}
+.card.rr-pad{padding-top:60px}
+.q{font-size:clamp(21px,5.6vw,32px)}
+
+/* landing + lobby */
+.land{text-align:center}
+.land .big2{display:grid;gap:12px;max-width:420px;margin:16px auto 0}
+.land .big2 .btn{width:100%}
+.codebox{display:flex;gap:10px;max-width:420px;margin:12px auto 0}
+.codebox input{text-align:center;font-family:var(--display);font-size:30px;letter-spacing:.3em;text-transform:uppercase}
+.roomcode{font-family:var(--display);font-size:clamp(56px,18vw,96px);letter-spacing:.18em;color:var(--gold);text-shadow:0 0 30px rgba(255,210,63,.5);line-height:1;margin:6px 0}
+.lobbystat{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0}
+.lobbystat span{padding:8px 14px;border-radius:99px;background:rgba(0,0,0,.3);border:1px solid var(--line);font-weight:800;font-size:14px}
+.lobbystat span.ok{border-color:var(--ok);color:var(--ok)}
+.adult{display:flex;align-items:center;gap:10px;justify-content:center;margin:14px auto 0;padding:12px 14px;border-radius:14px;border:2px solid #ff3d6e;background:rgba(255,40,100,.12);max-width:460px;font-weight:700;font-size:14px;text-align:left;cursor:pointer}
+.adult input{width:22px;height:22px;accent-color:#ff3d6e;flex:none}
+.adult .two{margin-left:auto;font-size:12px;opacity:.85;white-space:nowrap}
+.summary{display:grid;gap:6px;max-width:460px;margin:12px auto 0;text-align:left}
+.summary div{padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-weight:700;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.resume{margin-top:14px;padding:12px;border-radius:14px;border:1px dashed var(--gold);background:rgba(255,210,63,.07)}
+
+/* waiting */
+.waitbox{text-align:center;padding:10px 0 4px}
+.waitbox .spin{font-size:54px;display:inline-block;animation:bob 1.6s ease-in-out infinite}
+.waitbox .msg{font-family:var(--display);font-size:clamp(20px,5vw,28px);letter-spacing:.04em;text-transform:uppercase;margin-top:8px}
+.waitbox .sub{opacity:.8;margin-top:6px;font-size:15px}
+.dots::after{content:"";animation:dots 1.4s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.mine-note{max-width:520px;margin:12px auto 0;padding:12px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--line);font-size:14px;text-align:center}
+.mine-note b{color:var(--gold)}
+.tile .tf .mine{margin-left:12px;font-weight:800;font-size:15px;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70%}
+.tile .tf.hasmine{justify-content:flex-start;padding-left:10px}
+
+/* reroll vote */
+.reroll.voted{background:var(--gold);color:var(--deep2)}
+.reroll.asked{animation:pulse .8s ease-in-out infinite;border-color:#fff;color:#fff;background:rgba(255,210,63,.35)}
+#votebar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(30px);opacity:0;visibility:hidden;pointer-events:none;z-index:65;display:flex;align-items:center;gap:10px;
+  padding:10px 12px 10px 16px;border-radius:16px;background:rgba(20,6,36,.95);border:2px solid var(--gold);box-shadow:0 10px 30px rgba(0,0,0,.6);transition:.35s;font-weight:800;font-size:14px;max-width:94vw}
+#votebar.on{transform:translateX(-50%);opacity:1;visibility:visible;pointer-events:auto}
+#votebar .btn{padding:9px 14px;font-size:14px}
+#offline{position:fixed;inset:0;z-index:90;background:rgba(5,0,10,.82);backdrop-filter:blur(4px);display:none;place-items:center;text-align:center;padding:20px}
+#offline.on{display:grid}
+#offline .box{max-width:360px}
+#offline .msg{font-family:var(--display);font-size:28px;letter-spacing:.05em;text-transform:uppercase;margin:10px 0}
+.readyrow .btn.waiting{background:rgba(255,255,255,.1);color:#fff;box-shadow:none;border:1px solid var(--line)}
+.who-tag{display:inline-block;margin:0 auto 10px;padding:5px 12px;border-radius:99px;font-weight:800;font-size:13px;background:rgba(0,0,0,.3);border:1px solid var(--line)}
+.center-row{text-align:center}
+@media (max-width:640px){
+  .rgrid{grid-template-columns:1fr}
+  .heat{grid-template-columns:repeat(3,1fr)}
+  .heat button{padding:10px 6px}
+  .heat button b{font-size:14px}
+  .heat button small{display:none}
+}
+</style>
+</head>
+<body>
+<div class="beams"><i></i><i></i><i></i></div>
+<div class="floor"></div>
+<canvas id="fx"></canvas>
+<canvas id="burst"></canvas>
+<div id="curtain"><div class="cur l"></div><div class="cur r"></div><div class="val"></div></div>
+<div id="flash"></div><div id="hype"></div><div id="bigx"><span>✕</span></div><div class="toast" id="toast"></div>
+<div id="votebar"></div>
+<div id="offline"><div class="box"><div style="font-size:54px">📡</div><div class="msg dots">Reconnecting</div><div>Lost the connection to the host's phone. Make sure their screen is on and the game is open.</div></div></div>
+<div class="wrap">
+  <div class="topbar"><div class="netpill" id="netpill"><i></i><b>Offline</b></div><div class="ctrls"><button id="fs" title="Fullscreen">⛶</button><button id="mic" title="Announcer voice">🎙️</button><button id="snd" title="Sound">🔊</button></div></div>
+  <div class="marquee" id="plate"><h1>Couple's Clash</h1><span class="neon">after dark</span></div>
+  <div class="tagline">how well do you really know each other?</div>
+  <div class="board" id="board">
+    <div class="pod" id="pod0"><span class="crown">👑</span><span class="streak"></span><div class="pname"></div><span class="you"></span><div class="score">0</div><span class="st"></span></div>
+    <div class="roundtag" id="roundtag"></div>
+    <div class="pod" id="pod1"><span class="crown">👑</span><span class="streak"></span><div class="pname"></div><span class="you"></span><div class="score">0</div><span class="st"></span></div>
+  </div>
+  <main id="stage"></main>
+</div>
+<script>
+const KNOWME = [
+ "{S}'s go-to fast food order","{S}'s dream vacation destination","{S}'s biggest pet peeve","{S}'s ultimate comfort movie or show",
+ "The app {S} uses most","What {S} wanted to be when they grew up","{S}'s least favorite chore","{S}'s go-to karaoke song",
+ "{S}'s gas station snack of choice","{S}'s idea of a perfect lazy Saturday","The weird food combo {S} secretly loves","{S}'s hidden talent",
+ "{S}'s last meal on Earth","The first thing {S} does in the morning","{S}'s most irrational fear","The first thing {S} would buy after winning the lottery",
+ "The celebrity {S} would most want to have dinner with","{S}'s favorite date the two of you have been on","{S}'s first impression of {G}","{S}'s favorite thing about {G}",
+ "The most annoying thing {G} does, according to {S}","Where {S} would live if money didn't matter","The song {S} has been playing the most lately","The fictional character {S} would most want to be",
+ "{S}'s zombie apocalypse weapon of choice","What {S} would name a pet goldfish","The decade {S} would time-travel to","Who {S} thinks is the better driver",
+ "Who {S} thinks said \"I love you\" first","{S}'s guilty pleasure TV show","The smell {S} loves most","{S}'s go-to drink order",
+ "What {S} would do with a free day and no responsibilities","{S}'s favorite memory of the two of you","{S}'s favorite candy","{S}'s favorite holiday",
+ "The food {S} would never eat again if they could help it","{S}'s favorite board or card game","{S}'s celebrity crush","The movie {S} could watch a hundred times",
+ "{S}'s favorite season","{S}'s favorite thing to cook","{S}'s go-to excuse to get out of plans","The thing {S} spends too much money on",
+ "{S}'s worst habit","The word or phrase {S} says all the time","The chore {S} would happily do forever","{S}'s favorite pizza place",
+ "{S}'s favorite sit-down restaurant","{S}'s dream car","{S}'s favorite animal","The superpower {S} would pick",
+ "{S}'s least favorite food","{S}'s favorite ice cream flavor","{S}'s favorite breakfast","The thing that always makes {S} laugh",
+ "The thing that always puts {S} in a bad mood","{S}'s favorite TV show of all time","{S}'s favorite musician or band","{S}'s favorite sport to watch",
+ "{S}'s favorite way to relax","{S}'s dream job","{S}'s favorite subject in school","{S}'s least favorite subject in school",
+ "The first concert {S} went to","{S}'s first car","{S}'s favorite childhood toy","{S}'s favorite cartoon growing up",
+ "Where {S} would go on a surprise weekend trip","What {S} orders at a coffee shop","{S}'s favorite thing to do on a rainy day","{S}'s go-to midnight snack",
+ "The thing {S} would grab in a house fire (people and pets are safe)","{S}'s favorite outfit or piece of clothing","What {S} is most proud of","The thing {S} is secretly bad at",
+ "{S}'s biggest splurge in the last year","{S}'s favorite thing about where you live","What {S} wants for their birthday this year","{S}'s favorite thing {G} cooks or makes",
+ "The nickname {S} uses for {G} most","Where {S} wants to go on your next date","{S}'s favorite physical feature of {G}","The thing {G} does that {S} finds most attractive",
+ "{S}'s ideal anniversary celebration","{S}'s favorite sandwich","{S}'s favorite condiment","The emoji {S} uses most",
+ "{S}'s favorite Halloween costume they've worn","The reality show {S} would be best on","{S}'s favorite chip flavor","Who {S} calls first with big news (besides {G})",
+ "The store {S} could spend hours in","{S}'s comfort food after a bad day","The movie that always makes {S} cry","The household item {S} would replace first if money was no object",
+ "{S}'s favorite thing to do together on a weekend","The song {S} would pick for your first dance","The country {S} most wants to visit","{S}'s biggest turn-off",
+ "{S}'s favorite pizza topping","The food {S} could eat every single day","{S}'s spirit animal","The teacher {S} remembers most",
+ "{S}'s favorite candle or room scent","The thing {S} always forgets","The thing {S} is most likely to be doing at 10pm","{S}'s favorite thing about themselves",
+];
+
+const TOPLISTS = [
+ "{S}'s favorite foods","{S}'s favorite snacks","{S}'s favorite movies","{S}'s favorite TV shows","{S}'s favorite fast food places",
+ "{S}'s favorite desserts","{S}'s favorite animals","{S}'s favorite candies","{S}'s favorite pizza toppings","{S}'s favorite drinks",
+ "{S}'s favorite fruits","{S}'s favorite breakfast foods","{S}'s favorite ice cream flavors","{S}'s favorite singers or bands","{S}'s favorite places they've ever been",
+ "{S}'s favorite things to do on a day off","{S}'s favorite holidays","{S}'s favorite smells","{S}'s favorite colors","{S}'s favorite things about {G}",
+ "{S}'s biggest pet peeves","{S}'s favorite songs","{S}'s favorite restaurants","{S}'s favorite celebrities","{S}'s favorite comfort foods",
+ "{S}'s favorite cartoons growing up","{S}'s favorite apps on their phone","{S}'s favorite games (any kind)","Things {S} would bring to a desert island","{S}'s favorite sides and appetizers",
+ "{S}'s favorite vegetables","{S}'s favorite cereals","{S}'s favorite chip flavors","{S}'s favorite sandwiches","{S}'s favorite soups",
+ "{S}'s favorite cookies","{S}'s favorite sodas","{S}'s favorite Christmas movies","{S}'s favorite Halloween candies","{S}'s favorite animated movies",
+ "{S}'s favorite actors and actresses","{S}'s favorite stores to shop at","{S}'s favorite cities","Places {S} most wants to visit","Things {S} would buy if they got rich",
+ "Famous people {S} would invite to dinner","Things that make {S} happy","Things that annoy {S} while driving","{S}'s favorite things about summer","{S}'s favorite things about fall",
+ "{S}'s favorite gifts they've ever gotten","{S}'s favorite clothing items","{S}'s favorite things to cook","{S}'s favorite things to order at a Mexican restaurant","{S}'s favorite burger toppings",
+ "{S}'s favorite cheeses","{S}'s favorite date activities","{S}'s favorite memories with {G}","{S}'s favorite video games","{S}'s favorite board games",
+ "{S}'s favorite kinds of music","{S}'s favorite superheroes","{S}'s favorite things in your home","{S}'s favorite things to do outside","{S}'s favorite pasta dishes",
+ "{S}'s favorite things to order at a Chinese restaurant","{S}'s favorite treats from childhood","{S}'s favorite hobbies","{S}'s favorite movie theater snacks","{S}'s favorite holiday traditions",
+ "Things {S} can't live without","{S}'s favorite TV characters","{S}'s favorite things to buy at Target","{S}'s favorite breakfast cereals as a kid","{S}'s favorite words to describe {G}",
+];
+
+// [category, [[emoji, item], ...]]
+const RANKS = [
+ ["fast food chains",[["🍔","McDonald's"],["🌮","Taco Bell"],["🐔","Chick-fil-A"],["🍟","Wendy's"],["👑","Burger King"]]],
+ ["pizza toppings",[["🍕","Pepperoni"],["🌭","Sausage"],["🍄","Mushrooms"],["🍍","Pineapple"],["🧀","Extra cheese"]]],
+ ["seasons",[["🌷","Spring"],["☀️","Summer"],["🍂","Fall"],["❄️","Winter"]]],
+ ["holidays",[["🎄","Christmas"],["🎃","Halloween"],["🦃","Thanksgiving"],["🎆","Fourth of July"],["💘","Valentine's Day"]]],
+ ["ways to spend a Friday night",[["🍿","Movie at home"],["🍝","Dinner out"],["🎉","Party with friends"],["🎮","Video games"],["😴","Early bedtime"]]],
+ ["desserts",[["🍦","Ice cream"],["🎂","Cake"],["🍪","Cookies"],["🍫","Brownies"],["🥧","Pie"]]],
+ ["pets",[["🐶","Dog"],["🐱","Cat"],["🐹","Hamster"],["🐠","Fish"],["🦎","Lizard"]]],
+ ["breakfasts",[["🥞","Pancakes"],["🧇","Waffles"],["🥓","Eggs and bacon"],["🥣","Cereal"],["🌯","Breakfast burrito"]]],
+ ["chores",[["🍽️","Dishes"],["🧺","Laundry"],["🧹","Vacuuming"],["🗑️","Taking out the trash"],["🚽","Cleaning the bathroom"]]],
+ ["movie genres",[["😂","Comedy"],["👻","Horror"],["💥","Action"],["💕","Romance"],["🧸","Animated"]]],
+ ["candies",[["🥜","Reese's"],["🍫","Snickers"],["🌈","Skittles"],["🍬","Sour Patch Kids"],["🍫","Kit Kat"]]],
+ ["vacations",[["🏖️","Beach"],["🏔️","Mountains"],["🏙️","Big city"],["🎢","Theme park"],["🛳️","Cruise"]]],
+ ["drinks",[["☕","Coffee"],["🥤","Soda"],["🧋","Sweet tea"],["🍋","Lemonade"],["💧","Water"]]],
+ ["superpowers",[["🕊️","Flying"],["👻","Invisibility"],["✨","Teleportation"],["💪","Super strength"],["🧠","Reading minds"]]],
+ ["sides",[["🍟","Fries"],["🧅","Onion rings"],["🧀","Mac and cheese"],["🥔","Mashed potatoes"],["🥗","Coleslaw"]]],
+ ["date ideas",[["🥂","Fancy dinner"],["🎳","Bowling"],["🎬","Movie theater"],["🧺","Picnic"],["🎤","Concert"]]],
+ ["kinds of weather",[["☀️","Sunny and hot"],["🌧️","Rainy"],["🌨️","Snowy"],["⛈️","Thunderstorm"],["☁️","Cool and cloudy"]]],
+ ["ice cream flavors",[["🍫","Chocolate"],["🍦","Vanilla"],["🍪","Cookie dough"],["🌿","Mint chip"],["🍓","Strawberry"]]],
+ ["sports to watch",[["🏈","Football"],["🏀","Basketball"],["⚾","Baseball"],["🏒","Hockey"],["⚽","Soccer"]]],
+ ["snacks",[["🥔","Chips"],["🍿","Popcorn"],["🥨","Pretzels"],["🧀","Cheese and crackers"],["🍎","Fruit"]]],
+ ["cuisines",[["🌮","Mexican"],["🍝","Italian"],["🥡","Chinese"],["🍣","Japanese"],["🍖","BBQ"]]],
+ ["game night picks",[["🃏","Uno"],["🎩","Monopoly"],["🧱","Jenga"],["🏎️","Mario Kart"],["🎭","Charades"]]],
+ ["times of day",[["🌅","Morning"],["🌤️","Afternoon"],["🌇","Evening"],["🌙","Late night"]]],
+ ["streaming services",[["🔴","Netflix"],["🟢","Hulu"],["🏰","Disney+"],["▶️","YouTube"],["🟣","Max"]]],
+ ["potatoes",[["🍟","French fries"],["🥣","Mashed"],["🥔","Baked"],["🟫","Tater tots"],["🍳","Hash browns"]]],
+ ["ways to get around",[["🚗","Driving"],["🚶","Walking"],["🚲","Biking"],["✈️","Flying"],["🚆","Train"]]],
+ ["music genres",[["🎸","Rock"],["🎤","Hip hop"],["🤠","Country"],["🎹","Pop"],["🎷","Jazz"]]],
+ ["sandwiches",[["🧀","Grilled cheese"],["🥓","BLT"],["🥜","PB&J"],["🍗","Chicken sandwich"],["🥩","Philly cheesesteak"]]],
+ ["burger toppings",[["🧀","Cheese"],["🥓","Bacon"],["🧅","Onions"],["🥒","Pickles"],["🍅","Tomato"]]],
+ ["condiments",[["🍅","Ketchup"],["🌭","Mustard"],["🥚","Mayo"],["🌶️","Hot sauce"],["🥗","Ranch"]]],
+ ["fruits",[["🍎","Apple"],["🍌","Banana"],["🍓","Strawberry"],["🍉","Watermelon"],["🍇","Grapes"]]],
+ ["vegetables",[["🥦","Broccoli"],["🥕","Carrots"],["🌽","Corn"],["🥔","Potatoes"],["🫑","Peppers"]]],
+ ["cookies",[["🍪","Chocolate chip"],["🥜","Peanut butter"],["🍬","Sugar"],["🍫","Double chocolate"],["🌾","Oatmeal raisin"]]],
+ ["sodas",[["🥤","Coke"],["🥤","Pepsi"],["🍋","Sprite"],["🍒","Dr Pepper"],["🟢","Mountain Dew"]]],
+ ["pasta dishes",[["🍝","Spaghetti"],["🧀","Mac and cheese"],["🍲","Lasagna"],["🥛","Fettuccine Alfredo"],["🥟","Ravioli"]]],
+ ["Chinese takeout orders",[["🍗","Orange chicken"],["🍚","Fried rice"],["🍜","Lo mein"],["🥟","Crab rangoon"],["🥢","General Tso's"]]],
+ ["Mexican foods",[["🌮","Tacos"],["🌯","Burritos"],["🧀","Quesadillas"],["🥑","Chips and guac"],["🫔","Enchiladas"]]],
+ ["zoo animals",[["🦁","Lion"],["🐘","Elephant"],["🦒","Giraffe"],["🐒","Monkey"],["🐧","Penguin"]]],
+ ["ocean animals",[["🐬","Dolphin"],["🦈","Shark"],["🐙","Octopus"],["🐢","Sea turtle"],["🐋","Whale"]]],
+ ["farm animals",[["🐄","Cow"],["🐖","Pig"],["🐐","Goat"],["🐔","Chicken"],["🐴","Horse"]]],
+ ["Christmas traditions",[["🎁","Opening presents"],["🎄","Decorating the tree"],["🍪","Baking cookies"],["🎶","Christmas music"],["🎬","Holiday movies"]]],
+ ["Halloween things",[["🍬","Candy"],["🎃","Carving pumpkins"],["👻","Haunted houses"],["🧛","Costumes"],["🎬","Scary movies"]]],
+ ["summer activities",[["🏊","Swimming"],["🍖","Cookouts"],["🎆","Fireworks"],["⛺","Camping"],["🍦","Ice cream runs"]]],
+ ["winter activities",[["⛄","Building a snowman"],["⛸️","Ice skating"],["☕","Hot cocoa"],["🛷","Sledding"],["🛋️","Staying in under blankets"]]],
+ ["ways to relax",[["🛁","Hot bath"],["📺","TV"],["😴","Nap"],["📚","Reading"],["🚶","Going for a walk"]]],
+ ["gifts",[["💐","Flowers"],["🍫","Chocolate"],["💌","Handwritten letter"],["💎","Jewelry"],["🎟️","Tickets to something"]]],
+ ["love languages",[["💬","Words of affirmation"],["🤗","Physical touch"],["🎁","Gifts"],["⏰","Quality time"],["🧽","Acts of service"]]],
+ ["breads",[["🥖","Baguette"],["🥐","Croissant"],["🥯","Bagel"],["🍞","Toast"],["🧄","Garlic bread"]]],
+ ["chip flavors",[["🥔","Original"],["🧂","Salt and vinegar"],["🧀","Nacho cheese"],["🍖","BBQ"],["🧅","Sour cream and onion"]]],
+ ["ice cream toppings",[["🍫","Hot fudge"],["🌈","Sprinkles"],["🍒","Cherry"],["🥜","Nuts"],["🍯","Caramel"]]],
+ ["Pixar movies",[["🤠","Toy Story"],["🐠","Finding Nemo"],["🎈","Up"],["🦸","The Incredibles"],["👹","Monsters, Inc."]]],
+ ["kinds of TV",[["🕵️","Crime shows"],["😂","Sitcoms"],["🌹","Reality dating"],["🍳","Cooking shows"],["📼","Documentaries"]]],
+ ["board games",[["🎩","Monopoly"],["🔤","Scrabble"],["🔍","Clue"],["🔄","Sorry!"],["🚗","The Game of Life"]]],
+ ["card games",[["🃏","Uno"],["♠️","Poker"],["❤️","Hearts"],["🐟","Go Fish"],["🂡","Solitaire"]]],
+ ["sports to play",[["⚽","Soccer"],["🏀","Basketball"],["🎾","Tennis"],["⛳","Golf"],["🎳","Bowling"]]],
+ ["places to nap",[["🛋️","Couch"],["🛏️","Bed"],["🚗","Car"],["🏖️","Beach"],["🌳","Hammock"]]],
+ ["places to live",[["🏙️","Big city"],["🏡","Suburbs"],["🌾","Countryside"],["🏖️","Beach town"],["🏔️","Mountain cabin"]]],
+ ["coffee drinks",[["☕","Black coffee"],["🥛","Latte"],["🍫","Mocha"],["🧊","Iced coffee"],["🎃","Pumpkin spice latte"]]],
+ ["fair foods",[["🌭","Corn dog"],["🍩","Funnel cake"],["🍭","Cotton candy"],["🍋","Lemon shake-up"],["🍗","Turkey leg"]]],
+ ["cereals",[["🌀","Froot Loops"],["🍯","Honey Nut Cheerios"],["🍫","Cocoa Puffs"],["🧁","Cinnamon Toast Crunch"],["🍀","Lucky Charms"]]],
+ ["decades of music",[["📻","60s"],["🕺","70s"],["🎸","80s"],["💿","90s"],["📱","2000s"]]],
+ ["road trip essentials",[["🎶","Playlist"],["🍿","Snacks"],["🛌","Pillow"],["🗺️","Random stops"],["📸","Photos"]]],
+];
+
+// [question, label for 1, label for 100]. Built to land in the middle, not at the ends.
+const SCALES = [
+ ["What percent of the time does {S} pick where you two eat?","Never","Every time"],
+ ["What percent battery is {S}'s phone at right now?","Dead","Full"],
+ ["What percent of the songs on {S}'s playlist could they sing every word to?","None","All of them"],
+ ["What percent of the clothes {S} owns do they actually wear?","Hardly any","All of them"],
+ ["What percent of the time is {S} running late?","Never","Always"],
+ ["What percent of {S}'s camera roll is screenshots?","None","All of it"],
+ ["What percent of your arguments does {S} think they win?","None","All of them"],
+ ["What percent of the movies {S} starts do they actually finish?","None","All of them"],
+ ["What percent of the time does {S} actually read the instructions?","Never","Always"],
+ ["What percent of {S}'s texts have an emoji in them?","None","Every one"],
+ ["What percent of the household chores does {S} think they do?","None","All of them"],
+ ["What percent of their dreams does {S} remember?","None","All of them"],
+ ["What percent of mornings does {S} hit snooze?","Never","Every day"],
+ ["What percent of the time is {S} cold?","Never","Always"],
+ ["What percent of the shows {S} watches are rewatches?","None","All of them"],
+ ["What percent of unknown calls does {S} let go to voicemail?","None","All of them"],
+ ["What percent of {S}'s screen time is social media?","None","All of it"],
+ ["What percent of nights does {S} fall asleep first?","Never","Every night"],
+ ["What percent of {S}'s friends' birthdays could they name right now?","None","All of them"],
+ ["What percent of leftovers does {S} actually eat?","None","Every bite"],
+ ["What percent of the time does {S} make the bed?","Never","Every day"],
+ ["What percent of {S}'s week is spent in sweatpants or pajamas?","None","All of it"],
+ ["What percent of songs does {S} skip before they end?","None","All of them"],
+ ["What percent of {S}'s online shopping carts actually get bought?","None","All of them"],
+ ["What percent of the time does {S} say \"I'm fine\" when they're not?","Never","Always"],
+ ["What percent of New Year's resolutions does {S} keep?","None","All of them"],
+ ["What percent of the time does {S} remember where they parked?","Never","Always"],
+ ["What percent of TV time is {S} also on their phone?","None","All of it"],
+ ["What percent of {S}'s meals are eaten in front of a screen?","None","All of them"],
+ ["What percent of the time does {S} order the same thing at a restaurant?","Never","Always"],
+ ["What percent of {S}'s phone contacts do they actually talk to?","None","All of them"],
+ ["What percent of the blanket does {S} steal at night?","None","All of it"],
+ ["What percent of plans does {S} want to cancel last minute?","None","All of them"],
+ ["What percent of the driving does {S} do when you two go somewhere?","None","All of it"],
+ ["What percent of the time is {S} right about directions?","Never","Always"],
+ ["What percent of the dishes does {S} actually do?","None","All of them"],
+ ["What percent of the time is {S} thinking about food?","Never","Always"],
+ ["What percent of the gifts {S} has gotten did they actually like?","None","All of them"],
+ ["What percent of {S}'s closet is black, gray or white?","None","All of it"],
+ ["What percent of the time does {S} get the last word?","Never","Always"],
+ ["Rate {S}'s singing voice","Cats fighting","Grammy worthy"],
+ ["Rate {S}'s dance moves","Two left feet","Backup dancer"],
+ ["Rate {S}'s sense of direction","Lost in a parking lot","Human compass"],
+ ["Rate {S}'s parallel parking","Hits the curb","Perfect every time"],
+ ["Rate {S}'s cooking","Burns water","Restaurant quality"],
+ ["Rate {S}'s handwriting","Doctor scribble","Calligraphy"],
+ ["Rate {S}'s patience","Zero","Saint"],
+ ["Rate how good of a gift giver {S} is","Gift cards forever","Nails it every time"],
+ ["Rate {S}'s memory","Goldfish","Elephant"],
+ ["Rate how tidy {S} is","Tornado","Spotless"],
+ ["Rate {S}'s fashion sense","Socks with sandals","Runway ready"],
+ ["Rate how well {S} handles being sick","Dramatic mess","Powers through"],
+ ["Rate how competitive {S} is","Just here for fun","Must win"],
+ ["Rate {S}'s trivia knowledge","Clueless","Game show champ"],
+ ["Rate {S}'s poker face","Open book","Unreadable"],
+ ["Rate how good {S} is at video games","Button masher","Pro gamer"],
+ ["Rate {S}'s mood first thing in the morning","Grumpy goblin","Ray of sunshine"],
+ ["Rate how adventurous of an eater {S} is","Plain chicken only","Will try anything"],
+ ["Rate how good {S} is at saving money","Spends it all","Coupon king or queen"],
+ ["Rate {S}'s road trip DJ skills","Skip after skip","Perfect playlist"],
+ ["Rate how loud {S} snores","Silent","Chainsaw"],
+ ["Rate how good {S} is at telling jokes","Crickets","Stand-up ready"],
+ ["Rate how well {S} keeps plants alive","Plant killer","Green thumb"],
+ ["Rate how good {S} is at putting furniture together","Leftover screws","Master builder"],
+ ["Rate {S}'s pain tolerance","Paper cut panic","Unbreakable"],
+ ["Rate how much of a planner {S} is","Wings everything","Spreadsheet for everything"],
+ ["Rate how good {S} is at apologizing","Never sorry","Grand gestures"],
+ ["Rate {S}'s spice tolerance","Mild only","Fire breather"],
+ ["Rate how good {S} is at remembering names","Hey... you","Never forgets"],
+ ["Rate how athletic {S} is","Couch potato","Athlete"],
+ ["Rate how good {S} is at math in their head","Needs a calculator","Human calculator"],
+ ["Rate {S}'s photo-taking skills","Blurry thumbs","Professional"],
+ ["Rate how good {S} is at hiding when they're annoyed","Obvious","Totally hidden"],
+ ["Rate {S}'s texting game","Dry texter","Novelist"],
+ ["Rate how brave {S} is at haunted houses","Runs out crying","Laughs at the actors"],
+ ["Rate how good {S} is at keeping a secret","Spills instantly","Vault"],
+];
+
+// Same Page: who's more likely to...
+const MORELIKELY = [
+ "get lost driving somewhere new","cry during a movie","forget an anniversary","eat the last slice without asking","fall asleep during a movie",
+ "apologize first after a fight","burn dinner","spend too much on online shopping","get a speeding ticket","win a game show",
+ "survive a zombie apocalypse","become famous","bring home a new pet without asking","sing in the shower","laugh at the wrong moment",
+ "lose their phone in the house","stay up all night binging a show","say \"I told you so\"","plan a surprise","cancel plans to stay home",
+ "start a conversation with a stranger","get hangry","hog the blanket","open the fridge ten times looking for a snack","forget where they parked",
+ "cry at a wedding","go viral online","eat dessert first","take forever to text back","scream during a horror movie",
+ "overpack for a trip","be late to their own party","take 100 selfies","start a diet and quit by lunch","kill a houseplant",
+ "remember everyone's birthday","try the weirdest thing on the menu","leave dishes in the sink","get sunburned","scream at a spider",
+ "wake up first","steal the other one's fries","buy something they don't need","become best friends with the waiter","get way too competitive at game night",
+ "fall asleep first","get us lost on a hike","talk during a movie","eat in bed","sneak a snack at midnight",
+ "say yes to a last minute road trip","forget to pay a bill","make friends with the neighbor's dog","rearrange the furniture on a whim","win an argument",
+];
+// Same Page: would you rather [option A, option B]
+const WYR = [
+ ["Go on a beach getaway","Stay in a mountain cabin"],["Eat breakfast for dinner","Eat dinner for breakfast"],["Have a movie night in","Go out for a dinner date"],
+ ["Be able to fly","Be invisible"],["Always be 10 minutes late","Always be 20 minutes early"],["Give up pizza forever","Give up burgers forever"],
+ ["Live without music","Live without TV"],["Have an endless summer","Have an endless fall"],["Have a dog","Have a cat"],
+ ["Take a road trip","Take a flight"],["Always be a little too hot","Always be a little too cold"],["Only eat sweet snacks","Only eat salty snacks"],
+ ["Read minds","See the future"],["Always cook dinner","Always do the dishes"],["Have a big wedding","Elope"],
+ ["Live in the city","Live in the country"],["Only be able to text","Only be able to call"],["Watch the sunrise","Watch the sunset"],
+ ["Give up social media","Give up TV"],["Only drink coffee","Only drink tea"],["Have chocolate everything","Have vanilla everything"],
+ ["Time travel to the past","Time travel to the future"],["Have a personal chef","Have a personal maid"],["Eat pancakes","Eat waffles"],
+ ["Go to a concert","Go to a sports game"],["Be famous","Be rich but unknown"],["Get free food for life","Get free travel for life"],
+ ["Rewatch a favorite show","Start a brand new show"],["Eat at a fancy restaurant","Have a backyard BBQ"],["Have a pool","Have a hot tub"],
+ ["Be able to talk to animals","Be able to speak every language"],["Camp in a tent","Stay in a fancy hotel"],["Fight one horse-sized duck","Fight 100 duck-sized horses"],
+ ["Never be cold again","Never be hot again"],["Live without your phone for a month","Live without your car for a month"],["Have more time","Have more money"],
+ ["Skip Christmas this year","Skip your birthday this year"],["Spend the day at a theme park","Spend the day at a water park"],["Binge a show all night","Have a game night"],
+ ["Only eat spicy food","Only eat mild food"],["Get breakfast in bed","Get a massage"],["Sleep in on Saturday","Get stuff done early on Saturday"],
+ ["Eat only pizza forever","Eat only tacos forever"],["Have a snow day","Have a beach day"],["Redo high school","Skip straight to retirement"],
+ ["Live in a treehouse","Live on a houseboat"],["Lose your sense of taste","Lose your sense of smell"],["Be the funniest person in the room","Be the smartest person in the room"],
+ ["Eat only sweet food for a year","Eat only savory food for a year"],["Plan every date","Be surprised by every date"],["Watch a comedy","Watch a scary movie"],
+ ["Only shop in stores","Only shop online"],["See your favorite band live","Meet your favorite actor"],["Own a cleaning robot","Own a self-driving car"],
+ ["Win a free vacation","Win a new car"],["Never wait in line again","Never sit in traffic again"],["Sing instead of talking for a day","Dance everywhere you walk for a day"],
+ ["Have a rewind button for your life","Have a pause button for your life"],["Only celebrate Halloween","Only celebrate Thanksgiving"],["Live next to the beach","Live next to the mountains"],
+];
+
+
+// Pick Three: [category, [options...]]. Options are written in Title Case so a custom answer blends in.
+const PICK3 = [
+ ["colors",["Red","Orange","Yellow","Green","Blue","Purple","Pink","Black","White","Gray","Brown","Teal","Navy Blue","Maroon","Gold","Silver","Turquoise","Lavender","Mint Green","Coral"]],
+ ["vegetables",["Broccoli","Carrots","Corn","Potatoes","Green Beans","Peas","Spinach","Asparagus","Brussels Sprouts","Cauliflower","Zucchini","Bell Peppers","Onions","Mushrooms","Cucumbers","Sweet Potatoes","Celery","Cabbage","Kale","Tomatoes"]],
+ ["fruits",["Apples","Bananas","Strawberries","Blueberries","Grapes","Oranges","Watermelon","Pineapple","Mango","Peaches","Cherries","Raspberries","Kiwi","Pears","Lemons","Cantaloupe","Plums","Blackberries","Coconut","Grapefruit"]],
+ ["pizza toppings",["Pepperoni","Sausage","Mushrooms","Onions","Green Peppers","Black Olives","Bacon","Pineapple","Ham","Extra Cheese","Spinach","Jalapeños","Chicken","Tomatoes","Banana Peppers","Anchovies","Meatballs","Garlic"]],
+ ["ice cream flavors",["Vanilla","Chocolate","Strawberry","Cookie Dough","Mint Chocolate Chip","Cookies and Cream","Rocky Road","Butter Pecan","Neapolitan","Coffee","Moose Tracks","Pistachio","Salted Caramel","Birthday Cake","Chocolate Chip","Peanut Butter Cup","Black Cherry","Rainbow Sherbet"]],
+ ["dog breeds",["Labrador Retriever","Golden Retriever","German Shepherd","French Bulldog","Poodle","Beagle","Dachshund","Husky","Corgi","Chihuahua","Pug","Boxer","Border Collie","Great Dane","Shih Tzu","Pit Bull","Rottweiler","Bernese Mountain Dog","Australian Shepherd"]],
+ ["sports to watch",["Football","Basketball","Baseball","Hockey","Soccer","Tennis","Golf","Boxing","MMA","NASCAR","Formula 1","Volleyball","Gymnastics","Swimming","Figure Skating","Wrestling","Track and Field","Bowling"]],
+ ["fast food spots",["McDonald's","Taco Bell","Chick-fil-A","Wendy's","Burger King","Subway","Chipotle","Popeyes","KFC","Arby's","Sonic","Five Guys","Panda Express","Jack in the Box","Culver's","Whataburger","In-N-Out","Dairy Queen","Domino's","Panera"]],
+ ["candies",["Reese's Cups","Snickers","Kit Kat","M&M's","Skittles","Twix","Sour Patch Kids","Starburst","Milky Way","Butterfinger","Hershey's Bar","Swedish Fish","Twizzlers","Nerds","Jolly Ranchers","Gummy Bears","Airheads","Peanut M&M's","3 Musketeers","Almond Joy"]],
+ ["breakfast foods",["Pancakes","Waffles","French Toast","Bacon","Sausage","Scrambled Eggs","Omelet","Hash Browns","Biscuits and Gravy","Cereal","Oatmeal","Yogurt Parfait","Bagel","Donuts","Breakfast Burrito","Avocado Toast","Cinnamon Rolls","Eggs Benedict","Muffins"]],
+ ["desserts",["Cheesecake","Brownies","Chocolate Cake","Apple Pie","Ice Cream","Cookies","Cupcakes","Tiramisu","Banana Pudding","Key Lime Pie","Donuts","Churros","Crème Brûlée","Funnel Cake","Peach Cobbler","Carrot Cake","Pumpkin Pie","Lava Cake"]],
+ ["drinks",["Coffee","Tea","Water","Lemonade","Orange Juice","Coke","Sprite","Dr Pepper","Sweet Tea","Milk","Chocolate Milk","Smoothie","Hot Chocolate","Iced Coffee","Energy Drink","Root Beer","Sparkling Water","Apple Juice","Milkshake"]],
+ ["cuisines",["Mexican","Italian","Chinese","Japanese","Thai","Indian","Greek","American","Korean","Vietnamese","French","Mediterranean","Southern","Cajun","Spanish","Middle Eastern","Caribbean","German","Ethiopian"]],
+ ["music genres",["Pop","Rock","Hip Hop","Country","R&B","Jazz","Classical","EDM","Metal","Alternative","Indie","Reggae","Blues","Folk","Punk","Gospel","Latin","Soul","Funk","K-Pop"]],
+ ["movie genres",["Comedy","Horror","Action","Romance","Drama","Sci-Fi","Fantasy","Thriller","Animated","Documentary","Mystery","Musical","Western","Superhero","Romantic Comedy","War","Crime","Adventure"]],
+ ["games",["Monopoly","Scrabble","Clue","Uno","Jenga","Sorry!","The Game of Life","Connect Four","Battleship","Chess","Checkers","Yahtzee","Catan","Trivial Pursuit","Pictionary","Candy Land","Guess Who?","Operation","Apples to Apples","Poker"]],
+ ["animals",["Dog","Cat","Horse","Elephant","Lion","Tiger","Dolphin","Penguin","Panda","Giraffe","Monkey","Otter","Koala","Bear","Wolf","Owl","Fox","Sloth","Rabbit","Turtle"]],
+ ["sandwiches",["Grilled Cheese","BLT","Turkey Club","Ham and Cheese","Peanut Butter and Jelly","Philly Cheesesteak","Reuben","Chicken Salad","Tuna Melt","Meatball Sub","Italian Sub","French Dip","Cuban","Pulled Pork","Egg Salad","Chicken Parm","Patty Melt","Breakfast Sandwich"]],
+ ["soups",["Chicken Noodle","Tomato","Chili","Broccoli Cheddar","French Onion","Clam Chowder","Minestrone","Potato","Beef Stew","Split Pea","Pho","Ramen","Chicken Tortilla","Lentil","Gumbo","Wedding Soup","Corn Chowder","Butternut Squash"]],
+ ["cheeses",["Cheddar","Mozzarella","Swiss","Pepper Jack","Provolone","Parmesan","Brie","Gouda","American","Feta","Blue Cheese","Colby Jack","Cream Cheese","Muenster","Goat Cheese","Havarti","Ricotta","Monterey Jack"]],
+ ["flowers",["Roses","Tulips","Sunflowers","Daisies","Lilies","Orchids","Peonies","Lavender","Carnations","Hydrangeas","Daffodils","Lilacs","Marigolds","Magnolias","Cherry Blossoms","Poppies","Irises","Dahlias","Gardenias","Violets"]],
+ ["kinds of vacations",["Beach","Mountains","Big City","Theme Park","Cruise","Camping","Road Trip","Ski Trip","Lake House","Tropical Island","Europe Tour","National Park","Wine Country","Desert","Cabin in the Woods","Las Vegas","All-Inclusive Resort","Safari"]],
+ ["car brands",["Toyota","Honda","Ford","Chevrolet","Jeep","Tesla","BMW","Mercedes-Benz","Audi","Subaru","Nissan","Hyundai","Kia","Dodge","Lexus","Porsche","Volkswagen","Mazda","Cadillac","Ram"]],
+ ["chip flavors",["Original","Sour Cream and Onion","Barbecue","Salt and Vinegar","Cheddar","Nacho Cheese","Cool Ranch","Jalapeño","Dill Pickle","Flamin' Hot","Kettle Cooked","Honey Mustard","Salsa Verde","Pizza","Buffalo","Sweet Chili","Lime","Ranch"]],
+ ["condiments",["Ketchup","Mustard","Mayo","Ranch","Hot Sauce","Barbecue Sauce","Honey Mustard","Sriracha","Soy Sauce","Salsa","Relish","Buffalo Sauce","Tartar Sauce","Thousand Island","Aioli","Teriyaki","Horseradish","Garlic Butter"]],
+ ["pastas",["Spaghetti","Penne","Mac and Cheese","Lasagna","Fettuccine","Ravioli","Tortellini","Rigatoni","Linguine","Rotini","Farfalle","Ziti","Gnocchi","Angel Hair","Orzo","Shells","Bucatini","Manicotti"]],
+ ["sea creatures",["Dolphin","Shark","Octopus","Sea Turtle","Whale","Jellyfish","Seahorse","Starfish","Manta Ray","Clownfish","Crab","Lobster","Sea Otter","Seal","Squid","Eel","Pufferfish","Stingray"]],
+ ["birds",["Eagle","Owl","Penguin","Flamingo","Parrot","Hummingbird","Cardinal","Blue Jay","Peacock","Robin","Hawk","Crow","Pelican","Swan","Toucan","Duck","Falcon","Goldfinch"]],
+ ["holidays",["Christmas","Halloween","Thanksgiving","Fourth of July","Valentine's Day","Easter","New Year's Eve","St. Patrick's Day","Memorial Day","Labor Day","Birthdays","Mother's Day","Father's Day","Cinco de Mayo","Super Bowl Sunday","Hanukkah","Groundhog Day","Mardi Gras"]],
+ ["school subjects",["Math","English","History","Science","Art","Music","Gym","Spanish","Chemistry","Biology","Physics","Geography","Computer Class","Recess","Lunch","Home Ec","Shop Class","Drama"]],
+ ["smells",["Fresh Coffee","Rain","Fresh Cut Grass","Baking Cookies","Campfire","Clean Laundry","Vanilla","Lavender","Pine Trees","Bacon","Popcorn","Ocean Air","Cinnamon","New Car","Fresh Bread","Sunscreen","Gasoline","Old Books","Lilacs"]],
+ ["outdoor activities",["Hiking","Swimming","Fishing","Camping","Biking","Kayaking","Golf","Running","Picnics","Gardening","Beach Days","Skiing","Bonfires","Stargazing","Boating","Rock Climbing","Frisbee","Walking the Dog"]],
+ ["superpowers",["Flying","Invisibility","Teleportation","Super Strength","Mind Reading","Time Travel","Healing","Shape Shifting","Super Speed","Telekinesis","Talking to Animals","Breathing Underwater","X-Ray Vision","Freezing Time","Weather Control","Immortality","Laser Eyes","Super Intelligence"]],
+ ["apps",["Instagram","TikTok","YouTube","Facebook","Snapchat","Spotify","Netflix","Reddit","X","Pinterest","Amazon","Google Maps","Messages","Discord","Uber Eats","DoorDash","Venmo","Candy Crush"]],
+ ["cereals",["Froot Loops","Lucky Charms","Cinnamon Toast Crunch","Frosted Flakes","Honey Nut Cheerios","Cap'n Crunch","Cocoa Puffs","Reese's Puffs","Apple Jacks","Rice Krispies","Corn Flakes","Raisin Bran","Fruity Pebbles","Cocoa Pebbles","Golden Grahams","Trix","Honey Bunches of Oats","Frosted Mini-Wheats"]],
+ ["movie theater snacks",["Popcorn","Nachos","Hot Dog","Soft Pretzel","M&M's","Sour Patch Kids","Twizzlers","Milk Duds","Raisinets","Junior Mints","Skittles","Soda","Slushie","Candy Mix","Pizza","Chicken Tenders","Reese's Pieces","Swedish Fish"]],
+ ["seasons and weather",["Sunny Summer Days","Crisp Fall Days","Snowy Days","Spring Showers","Thunderstorms","Foggy Mornings","Warm Nights","Windy Days","Cloudy and Cool","First Snow","Heat Waves","Rainy Weekends","Clear Starry Nights","Autumn Leaves","Spring Blossoms","Beach Weather"]],
+];
+
+// The Draft. Classic lists are real rankings: [title, how it's ranked, [#1 ... #10]].
+const DRAFTS = [
+ ["Largest countries by area","Ranked by total area",["Russia","Canada","United States","China","Brazil","Australia","India","Argentina","Kazakhstan","Algeria"]],
+ ["Largest African countries","Ranked by total area",["Algeria","DR Congo","Sudan","Libya","Chad","Niger","Angola","Mali","South Africa","Ethiopia"]],
+ ["Largest South American countries","Ranked by total area",["Brazil","Argentina","Peru","Colombia","Bolivia","Venezuela","Chile","Paraguay","Ecuador","Guyana"]],
+ ["Most populous countries","UN 2025 estimates",["India","China","United States","Indonesia","Pakistan","Nigeria","Brazil","Bangladesh","Russia","Ethiopia"]],
+ ["Biggest US states","Ranked by land area",["Alaska","Texas","California","Montana","New Mexico","Arizona","Nevada","Colorado","Wyoming","Oregon"]],
+ ["Most populous US states","2020 census",["California","Texas","Florida","New York","Pennsylvania","Illinois","Ohio","Georgia","North Carolina","Michigan"]],
+ ["Most populous US cities","2020 census",["New York","Los Angeles","Chicago","Houston","Phoenix","Philadelphia","San Antonio","San Diego","Dallas","San Jose"]],
+ ["Most populous Canadian provinces","2021 census",["Ontario","Quebec","British Columbia","Alberta","Manitoba","Saskatchewan","Nova Scotia","New Brunswick","Newfoundland and Labrador","Prince Edward Island"]],
+ ["Tallest mountains on Earth","Ranked by height",["Everest","K2","Kangchenjunga","Lhotse","Makalu","Cho Oyu","Dhaulagiri","Manaslu","Nanga Parbat","Annapurna"]],
+ ["Largest lakes in the world","Ranked by surface area",["Caspian Sea","Lake Superior","Lake Victoria","Lake Huron","Lake Michigan","Lake Tanganyika","Lake Baikal","Great Bear Lake","Lake Malawi","Great Slave Lake"]],
+ ["Largest islands in the world","Ranked by area",["Greenland","New Guinea","Borneo","Madagascar","Baffin Island","Sumatra","Honshu","Victoria Island","Great Britain","Ellesmere Island"]],
+ ["Largest moons in the solar system","Ranked by diameter",["Ganymede","Titan","Callisto","Io","Earth's Moon","Europa","Triton","Titania","Rhea","Oberon"]],
+ ["Most common US last names","2010 census",["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Rodriguez","Martinez"]],
+ ["Most popular dog breeds","AKC 2025 rankings",["French Bulldog","Labrador Retriever","Golden Retriever","German Shepherd","Dachshund","Poodle","Beagle","Rottweiler","German Shorthaired Pointer","Bulldog"]],
+ ["Most popular baby boy names","Social Security, 2025",["Liam","Noah","Oliver","Theodore","Henry","James","Elijah","Mateo","William","Lucas"]],
+ ["Most popular baby girl names","Social Security, 2025",["Olivia","Charlotte","Emma","Amelia","Sophia","Mia","Isabella","Evelyn","Sofia","Eliana"]],
+ ["First states to join the Union","Ranked by order of statehood",["Delaware","Pennsylvania","New Jersey","Georgia","Connecticut","Massachusetts","Maryland","South Carolina","New Hampshire","Virginia"]],
+ ["The first 10 US presidents","Ranked by order in office",["George Washington","John Adams","Thomas Jefferson","James Madison","James Monroe","John Quincy Adams","Andrew Jackson","Martin Van Buren","William Henry Harrison","John Tyler"]],
+ ["The first 10 elements","Ranked by atomic number",["Hydrogen","Helium","Lithium","Beryllium","Boron","Carbon","Nitrogen","Oxygen","Fluorine","Neon"]],
+ ["MLB career home run leaders","All-time home runs",["Barry Bonds","Hank Aaron","Babe Ruth","Albert Pujols","Alex Rodriguez","Willie Mays","Ken Griffey Jr.","Jim Thome","Sammy Sosa","Frank Robinson"]],
+ ["Most common letters in English","Ranked by how often they appear",["E","T","A","O","I","N","S","H","R","D"]],
+];
+
+// Fib Detector: write the truth plus two fibs
+const FIBS = [
+ "The first concert {S} ever went to","{S}'s childhood nickname","{S}'s very first job","The worst haircut {S} ever had","What {S} was scared of as a kid",
+ "The first album {S} ever owned","The weirdest thing {S} ate as a kid","{S}'s favorite toy growing up","The name of {S}'s first pet","What {S} got in trouble for most as a kid",
+ "{S}'s first celebrity crush","The worst job {S} ever had","A food {S} hated as a kid but likes now","The strangest thing {S} has ever bought","The worst injury {S} has ever had",
+ "The first car {S} ever drove","{S}'s high school mascot","What {S} dressed up as for Halloween as a kid","A weird talent {S} had as a kid","The most embarrassing thing {S} did in school",
+ "The best gift {S} got as a kid","The first movie {S} remembers seeing in a theater","{S}'s favorite TV show as a kid","A house rule {S} hated growing up","The farthest {S} has ever traveled from home",
+ "Something {S} collected as a kid","The worst grade {S} ever got (and in what)","The first video game {S} was obsessed with","{S}'s go-to dance move at weddings","A famous person {S} has met or seen in person",
+ "The longest {S} has ever gone without sleep","The most expensive thing {S} ever broke","The grossest thing {S} has ever eaten","{S}'s first email address or username","The scariest thing {S} has ever done",
+ "A sport {S} played as a kid","Something {S} believed as a kid that wasn't true","The worst fashion choice {S} ever made","A song {S} knows every word to that would surprise you","The worst date {S} went on before {G}",
+ "The street {S} grew up on","The first thing {S} bought with their own money","Something {S} is weirdly proud of","A food {S} would refuse even on a dare","The strangest place {S} has ever fallen asleep",
+ "{S}'s worst kitchen disaster","What {S} wanted to name their first kid when they were little","The most trouble {S} ever got into at school","{S}'s first screen name or gamer tag","A weird phobia {S} has",
+];
+
+
+/* ============================ AFTER DARK (18+) ============================ */
+const KNOWME_X = [
+ "{S}'s favorite position","Where {S} most wants to have sex that you two haven't tried yet","{S}'s biggest turn-on","{S}'s biggest turn-off in bed","The sexiest thing {G} does without realizing it",
+ "{S}'s favorite thing {G} does with their hands","A song {S} would put on the sex playlist","{S}'s favorite time of day for sex","{S}'s secret fantasy, in one sentence","The kinkiest thing {S} would try at least once",
+ "{S}'s favorite part of {G}'s body","What {S} likes to wear to bed (or not wear)","Where {S} most likes to be kissed","{S}'s go-to move to get {G} in the mood","The craziest place {S} has ever hooked up",
+ "{S}'s celebrity hall pass","{S}'s favorite kind of foreplay","How {S} likes to be woken up for some fun","The dirtiest text {S} would actually send","The outfit {S} would love to see {G} in",
+ "The thing {G} says in bed that {S} loves most","{S}'s favorite memory of a hot night with {G}","{S}'s number one bedroom pet peeve","A toy {S} would want to try","{S}'s favorite role play scenario",
+ "The room in the house {S} would pick besides the bedroom","How {S} really feels about morning sex","The steamiest movie scene {S} can think of","{S}'s favorite way to be touched","How many times a week {S} would want sex in a perfect world",
+ "The best night you've had together, according to {S}","{S}'s favorite underwear or lingerie on {G}","What {S} wants more of in bed","What {S} would do with {G} on a no-rules hotel night","{S}'s favorite sound {G} makes",
+ "The first time {S} wanted to rip {G}'s clothes off","{S}'s go-to sexy emoji","Something {S} has always wanted to ask {G} to do","What {S} considers the perfect amount of dirty talk","The thing that turns {S} on fastest",
+ "{S}'s ideal way to end a date night","The body part {S} is most proud of","{S}'s favorite place to be bitten or nibbled","What {S} would want in a bedroom treasure chest","The word {S} would want {G} to whisper",
+];
+const TOPLISTS_X = [
+ "{S}'s favorite positions","Places {S} wants to have sex","{S}'s biggest turn-ons","{S}'s biggest turn-offs in bed","{S}'s favorite parts of {G}'s body",
+ "Things {S} wants to try in bed","{S}'s favorite kinds of foreplay","Songs {S} would put on a sex playlist","{S}'s celebrity hall passes","Things {G} wears that drive {S} crazy",
+ "{S}'s favorite places to be kissed","Outfits {S} wants {G} to wear","{S}'s favorite role play ideas","Toys or props {S} would try","{S}'s favorite hot memories with {G}",
+ "Rooms in the house {S} wants to christen","Things {S} finds sexy that aren't physical","{S}'s favorite ways to be teased","Words {S} likes hearing in bed","Steamy movies or shows {S} has watched",
+ "Things {S} would do on a no-rules vacation","Times of day {S} is most in the mood","Things that get {S} in the mood","Things that kill the mood for {S}","Things {S} wants {G} to do more of",
+ "Fantasies {S} would admit to","Public places {S} would sneak a kiss or more","Things {S} would put in a bedroom treasure chest","{S}'s favorite things to do after sex","{S}'s favorite sexy outfits for themselves",
+];
+const RANKS_X = [
+ ["positions",[["🤠","Cowgirl"],["🐕","Doggy style"],["🛏️","Missionary"],["🥄","Spooning"],["🧍","Standing"]]],
+ ["places to have sex",[["🛏️","Bed"],["🚿","Shower"],["🛋️","Couch"],["🍳","Kitchen counter"],["🚗","Car"]]],
+ ["kinds of foreplay",[["💋","Making out"],["💆","Massage"],["🗣️","Dirty talk"],["😈","Teasing"],["🛁","Shower together"]]],
+ ["times for sex",[["🌅","Morning"],["☀️","Lunch break"],["🌇","Before dinner"],["🌙","Bedtime"],["🌌","Middle of the night"]]],
+ ["kinks to try",[["🙈","Blindfold"],["🎀","Being tied up"],["🎭","Role play"],["🪞","Mirror"],["🧊","Ice cubes"]]],
+ ["bedroom soundtracks",[["🎷","Slow R&B"],["🎸","Rock"],["🔇","Silence"],["🎹","Pop"],["🌧️","Rain sounds"]]],
+ ["toys and props",[["📳","Vibrator"],["🔗","Handcuffs"],["🙈","Blindfold"],["🧴","Massage oil"],["🎲","Sex dice"]]],
+ ["role play scenarios",[["🍸","Strangers at a bar"],["🩺","Doctor visit"],["🏨","Room service"],["👔","Boss and assistant"],["💆","Massage therapist"]]],
+ ["outfits on a partner",[["🖤","Lingerie"],["👔","Just a dress shirt"],["🩲","Boxer briefs"],["👠","Heels and nothing else"],["🏈","A jersey"]]],
+ ["quickie spots",[["🚗","Car"],["🚻","Bathroom at a party"],["🧥","Coat closet"],["🛗","Elevator"],["🌲","Outdoors"]]],
+ ["things to hear in bed",[["😏","Don't stop"],["🔥","You're so hot"],["💬","Your name"],["🤫","Whispered plans"],["❤️","I love you"]]],
+ ["places to be kissed",[["💋","Lips"],["🦢","Neck"],["🍑","Inner thigh"],["👂","Ears"],["✨","Stomach"]]],
+ ["ways to start the night",[["🍷","Wine"],["🛁","Bath"],["💃","Lap dance"],["📱","Sexts all day"],["😘","Straight to it"]]],
+ ["vacation hookup spots",[["🏖️","Beach at night"],["♨️","Hotel hot tub"],["🌊","In the ocean"],["🛏️","Hotel bed"],["🌇","Balcony"]]],
+ ["ways to be teased",[["📱","Spicy texts"],["🩲","A flash of underwear"],["👂","Whispers in public"],["✋","Touch under the table"],["🚿","Shower invite"]]],
+ ["lingerie colors",[["🖤","Black"],["❤️","Red"],["🤍","White"],["💗","Pink"],["💜","Purple"]]],
+ ["date night endings",[["🛏️","Bed"],["🚗","Car before we get home"],["🛋️","Couch"],["🚿","Shower"],["😴","Sleep, honestly"]]],
+ ["after sex",[["🤗","Cuddling"],["🍕","Snacks"],["🚿","Shower"],["😴","Straight to sleep"],["🔁","Round two"]]],
+ ["fantasy settings",[["🏝️","Private island"],["🏨","Fancy hotel"],["⛺","Camping"],["🛥️","Yacht"],["🏔️","Ski cabin"]]],
+ ["dirty talk levels",[["🙊","None"],["🤭","A little"],["😏","Medium"],["🔥","Filthy"],["📖","Full novel"]]],
+];
+const SCALES_X = [
+ ["How kinky is {S}?","Vanilla","Fifty shades"],
+ ["In a perfect world, how often would {S} want sex?","Barely","Constantly"],
+ ["How loud is {S} in bed?","Silent","Neighbors know"],
+ ["How good is {S} at dirty talk?","Giggles","Filthy pro"],
+ ["How adventurous is {S} about new positions?","Same old","Kama Sutra"],
+ ["What percent of the time does {S} initiate?","Never","Always"],
+ ["How into morning sex is {S}?","Hard no","Best part of the day"],
+ ["How fast does teasing turn {S} on?","Not at all","Instantly"],
+ ["How much does {S} like being in control?","Total sub","Total dom"],
+ ["How daring is {S} about fooling around where you might get caught?","Never","Thrill seeker"],
+ ["Rate {S}'s stamina","Quick and done","Marathon"],
+ ["How much does {S} love foreplay?","Skip it","Could be the whole night"],
+ ["How likely is {S} to send a nude this week?","No chance","Already sent"],
+ ["How much would {S} enjoy a sex toy shopping trip together?","Mortified","Kid in a candy store"],
+ ["How confident is {S} naked?","Lights off","Strut around"],
+ ["How into blindfolds is {S}?","Not my thing","Love it"],
+ ["How into role play is {S}?","Cringe","Method actor"],
+ ["How much does {S} think about sex during the day?","Rarely","Constantly"],
+ ["How wild was {S} before {G}?","Saint","Legend"],
+ ["How does {S} feel about hickeys?","Hate them","Love them"],
+ ["How into quickies is {S}?","Takes the fun out","Any chance I get"],
+ ["How much does {S} like lingerie or sexy underwear?","Waste of money","Must have"],
+ ["How sensitive is {S}'s neck?","Not at all","Weak in the knees"],
+ ["How rough does {S} like it?","Gentle","Rough"],
+ ["How much does {S} like being teased before getting what they want?","Get to it","Make me beg"],
+ ["How open is {S} to trying anything once?","Not at all","Anything once"],
+ ["Rate {S}'s lap dance skills","Stiff robot","Professional"],
+ ["How likely is {S} to want round two?","Rarely","Every time"],
+ ["How bold are {S}'s sexts?","Very tame","Scandalous"],
+ ["How smooth is {S} at undressing {G}?","Fumbles","Smooth"],
+ ["How often do {S}'s massages turn into more?","Never","Always"],
+ ["How long would {S}'s perfect makeout session last?","Seconds","Hours"],
+ ["How much does {S} like sex with the lights on?","Lights off","Stadium lights"],
+ ["How into watching something steamy together is {S}?","Awkward","Great warmup"],
+ ["How good is {S} at keeping quiet when they have to?","Hopeless","Ninja"],
+];
+const MORELIKELY_X = [
+ "initiate sex","fall asleep right after sex","want morning sex","suggest a quickie","be louder in bed",
+ "send a nude first","suggest a new position","buy a sex toy","want to have sex somewhere public","get walked in on",
+ "suggest role play","be the dominant one","want to be tied up","fake being too tired","watch something steamy alone",
+ "sext during a work meeting","want sex on a road trip","suggest skinny dipping","get turned on at the worst possible time","rip the other's clothes off",
+ "want round two","forget to lock the door","suggest a shower together","leave a mark","stay up all night fooling around",
+ "get handsy in public","say something dirty at a family dinner","suggest strip poker","make a sex playlist","read an erotic novel",
+ "have a dream about a celebrity","suggest a sexy photoshoot","want to try a sex swing","blush buying condoms or lube","laugh during sex",
+ "pull a muscle during sex","get a cramp at the worst moment","want make-up sex after a fight","flash the other just for fun","book a hotel room just for sex",
+ "go commando","want sex in every room of the house","start a tickle fight that turns into sex","whisper something filthy in public","be the first to say \"bedroom, now\"",
+];
+const WYR_X = [
+ ["Have sex in the shower","Have sex on the kitchen counter"],["Have morning sex","Have midnight sex"],["Be on top","Be on the bottom"],
+ ["Use a blindfold","Use handcuffs"],["Have a long, slow night","Have a wild quickie"],["Have sex on a beach","Have sex in a hot tub"],
+ ["Get a lap dance","Give a lap dance"],["Do sexy role play","Do a sexy photoshoot"],["Dirty talk all night","Total silence"],
+ ["Lights on","Lights off"],["Get teased all day","Get it right away"],["Have sex in a fancy hotel","Have sex in a cabin in the woods"],
+ ["Be tied up","Do the tying"],["Watch something steamy together","Read something steamy together"],["Get a lingerie surprise","Get a strip tease surprise"],
+ ["Have sex in the car","Have sex outdoors"],["Only quickies for a month","Only marathons for a month"],["Play with ice cubes","Play with warm massage oil"],
+ ["Mirror on the ceiling","Mirror next to the bed"],["Get a sexy voicemail","Get a sexy photo"],["Shower together","Bathe together"],
+ ["Sex with music on","Sex with nothing on but each other"],["Be in control","Give up control"],["Get neck kisses","Get inner thigh kisses"],
+ ["Play strip poker","Play dirty truth or dare"],["Make out in a movie theater","Fool around in a dressing room"],["Have sex every day for a month","Have the best sex of your life once"],
+ ["Get spicy texts at work","Get spicy whispers at dinner"],["Use massage oil","Use whipped cream"],["Sleep naked forever","Never sleep naked again"],
+ ["Try a sex swing","Try a new toy"],["Get caught by the neighbors","Get caught by hotel housekeeping"],["Have wake-up sex","Have before-dinner sex"],
+ ["Leave a hickey everyone can see","Leave scratches no one can see"],["Spontaneous sex anywhere","Planned sex with all the build up"],["Be blindfolded","Be the one watching"],
+ ["Join the mile high club","Skinny dip at midnight"],["Role play strangers at a bar","Role play a steamy first date"],["Have sex on a balcony","Have sex on a rooftop"],
+ ["Bedroom with a fireplace","Bedroom with a hot tub"],["Loud and wild","Slow and quiet"],["Give a massage that leads to more","Get one"],
+ ["Wear a sexy costume","Wear nothing at all"],["Candlelight only","Full lights"],["Have the perfect kiss","Have the perfect foreplay"],
+];
+const PICK3_X = [
+ ["positions",["Missionary","Doggy Style","Cowgirl","Reverse Cowgirl","Spooning","Standing","Lotus","Sixty-Nine","Edge of the Bed","Legs Up","Against the Wall","In the Shower","Face to Face Sitting","Lazy Dog","Bridge"]],
+ ["places to have sex",["Bed","Shower","Couch","Kitchen Counter","Car","Hot Tub","Beach","Hotel Room","Floor","Pool","Outdoors","Balcony","Office","Dressing Room","Tent","Guest Room","Staircase","Laundry Room"]],
+ ["turn-ons",["Confidence","Dirty Talk","Being Teased","Eye Contact","A Deep Voice","Strong Hands","Lingerie","Neck Kisses","Being Pinned Down","Biting","Hair Pulling","Whispering","Good Cologne","Taking Charge","Being Undressed","Massages","Wearing My Clothes","Watching Them Work Out"]],
+ ["kinks to try",["Blindfolds","Handcuffs","Role Play","Spanking","Hair Pulling","Ice Play","Wax Play","Mirrors","Dirty Talk","Toys","Teasing and Denial","Feathers","Lap Dances","Strip Tease","Sexting","Massage Oil","Being Tied Up","Dom and Sub"]],
+ ["kinds of foreplay",["Kissing","Neck Kisses","Massages","Dirty Talk","Teasing","Undressing Slowly","Lap Dance","Shower Together","Ear Nibbles","Touching Over Clothes","Biting","Inner Thigh Kisses","Whispering","Sexting All Day","Strip Tease","Oral"]],
+ ["outfits on a partner",["Lingerie","Just a Dress Shirt","Boxer Briefs","Heels and Nothing Else","A Jersey","Suit and Tie","Little Black Dress","Gray Sweatpants","A Towel","Thigh Highs","Tight Jeans","Leather Jacket","Uniform","Robe","Nothing at All","Swimsuit"]],
+ ["sounds in the bedroom",["Moaning","Their Name","Dirty Talk","Whispering","Heavy Breathing","Laughing","Slow Music","Rain","Silence","Headboard Banging","I Love You","Don't Stop","Begging","Giggling","Growling"]],
+ ["places to be kissed",["Lips","Neck","Inner Thighs","Ears","Collarbone","Stomach","Lower Back","Chest","Shoulders","Hips","Hands","Feet","Back","Jawline","Wrists","Behind the Knee"]],
+ ["toys and props",["Vibrator","Handcuffs","Blindfold","Massage Oil","Feather","Sex Dice","Lingerie","Candles","Silk Ties","Whipped Cream","Ice Cubes","Mirror","Paddle","Lube","Sex Swing","Couples Toy"]],
+ ["role play ideas",["Strangers at a Bar","Doctor and Patient","Boss and Assistant","Cop and Suspect","Pizza Delivery","Hotel Room Service","Massage Therapist","Personal Trainer","Pilot and Flight Attendant","Superheroes","Firefighter","First Date","Royalty and Servant","Photographer and Model","Bartender and Customer","Neighbors"]],
+ ["times for sex",["Morning","Lunch Break","After Work","Before Dinner","After Dinner","Bedtime","Middle of the Night","Sunday Afternoon","Shower Time","After a Date","After a Fight","Vacation Mornings","Rainy Days","Holidays","Birthdays","Anytime"]],
+ ["sexy texts to get",["Come Home Now","I'm Not Wearing Anything","Thinking About Last Night","A Spicy Photo","What I Want to Do to You","Can't Stop Thinking About You","Guess What I'm Wearing","Meet Me in the Bedroom","You Looked Hot Today","I Need You","Clear Your Schedule Tonight","A Voice Memo","Shower With Me","Hurry Up","Miss Your Body"]],
+ ["after sex activities",["Cuddling","Snacks","Shower","Sleep","Round Two","Pillow Talk","Netflix","Ordering Food","Bath","Laughing","Back Scratches","Water Break","Scrolling Phones","Planning the Next Time","Massages","Dancing Around"]],
+];
+const FIBS_X = [
+ "The craziest place {S} has ever had sex","How old {S} was at their first kiss","Where {S} had their first kiss","The most embarrassing thing that's happened to {S} during sex","{S}'s weirdest turn-on",
+ "The first thing {S} noticed about {G}'s body","The wildest thing {S} has done in a car","{S}'s most embarrassing hookup story, in one sentence","A celebrity {S} has had a dirty dream about","The kinkiest thing {S} has already tried",
+ "{S}'s go-to move in bed","The longest {S} has gone without sex","The sexiest outfit {S} has ever worn","The worst pickup line {S} has ever fallen for","The riskiest place {S} has fooled around",
+ "What {S} was thinking the first time you two hooked up","The most daring photo {S} has ever sent","A fantasy {S} has never told anyone","The worst song {S} has heard during sex","Where {S} would most want to get caught",
+ "The steamiest dream {S} has had about {G}","{S}'s most memorable night with {G}","The first time {S} wanted to sleep with {G}","The strangest thing {S} has been asked to do in bed","Something {S} pretended to like in bed before {G}",
+ "{S}'s most awkward condom moment","The funniest thing that's happened to {S} mid-hookup","What {S} wore the first time you two slept together","The boldest flirting move {S} has ever made","The thing {S} has always wanted {G} to whisper",
+];
+const DRAFTS_X = [
+ ["Positions","PARTNER",["Missionary","Doggy style","Cowgirl","Reverse cowgirl","Spooning","Standing","Sixty-nine","Edge of the bed","Against the wall","In the shower"]],
+ ["Places to have sex","PARTNER",["Bed","Shower","Couch","Kitchen counter","Car","Hot tub","Beach","Hotel room","Outdoors","Balcony"]],
+ ["Foreplay","PARTNER",["Making out","Neck kisses","Massage","Dirty talk","Teasing","Undressing slowly","Lap dance","Shower together","Inner thigh kisses","Oral"]],
+ ["Kinks to try","PARTNER",["Blindfold","Handcuffs","Role play","Spanking","Hair pulling","Ice play","Wax play","Mirror","Toys","Being tied up"]],
+ ["Turn-ons","PARTNER",["Confidence","Dirty talk","Eye contact","A deep voice","Strong hands","Lingerie","Neck kisses","Being pinned down","Biting","Taking charge"]],
+ ["Things to wear to bed","PARTNER",["Nothing","Silk pajamas","Partner's T-shirt","Boxers","Lingerie","Sweatpants","Just underwear","Matching PJs","A robe","Just socks"]],
+ ["Role play scenarios","PARTNER",["Strangers at a bar","Doctor and patient","Boss and assistant","Cop and suspect","Room service","Massage therapist","Personal trainer","Pilot and flight attendant","Photographer and model","Bartender and customer"]],
+ ["Times for sex","PARTNER",["Morning","Lunch break","After work","Before dinner","After dinner","Bedtime","Middle of the night","Sunday afternoon","After a date","After a fight"]],
+ ["Sexy texts to get","PARTNER",["Come home now","I'm not wearing anything","Thinking about last night","A spicy photo","What I want to do to you","Guess what I'm wearing","Meet me in the bedroom","You looked hot today","Clear your schedule tonight","Shower with me"]],
+ ["Toys and props","PARTNER",["Vibrator","Handcuffs","Blindfold","Massage oil","Feather","Sex dice","Candles","Silk ties","Whipped cream","Ice cubes"]],
+ ["Places to be kissed","PARTNER",["Lips","Neck","Inner thighs","Ears","Collarbone","Stomach","Lower back","Chest","Shoulders","Hips"]],
+ ["Mood setters","PARTNER",["Candles","Slow music","Wine","Dim lights","Massage oil","A fireplace","A shower together","Lingerie","A slow dance","Whispering"]],
+ ["Features on a partner","PARTNER",["Eyes","Smile","Hands","Arms","Lips","Butt","Legs","Chest","Shoulders","Back"]],
+ ["After sex","PARTNER",["Cuddling","Snacks","Shower","Sleep","Round two","Pillow talk","Netflix","Bath","Back scratches","Ordering food"]],
+];
+
+/* =====================================================================
+   CONFIG + HELPERS
+   ===================================================================== */
+const $=s=>document.querySelector(s);
+const stage=$('#stage');
+const PREFIX='couplesclash-v5-';
+const PEEROPTS={debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}};
+const RDEF=[
+ {id:'km', name:'Know Me Best',   em:'🧠', blurb:'Answer about yourself while your partner guesses your answer, both at once.', opts:[['km','Questions each',[1,2,3,5]]]},
+ {id:'top',name:'Top of the List',em:'📋', blurb:'List your top picks. Your partner uncovers the board, Feud style.', opts:[['top','Lists each',[1,2,3]],['topN','Length',[3,5]]]},
+ {id:'p3', name:'Pick Three',     em:'🥇', blurb:'Pick your top 3 (or write your own). Your partner finds them in a lineup.', opts:[['p3','Rounds each',[1,2,3]]]},
+ {id:'rk', name:'Rank It',        em:'📊', blurb:'You rank your real order while your partner ranks their guess, at the same time.', opts:[['rk','Lists each',[1,2,3]]]},
+ {id:'sp', name:'Same Page',      em:'🤝', blurb:"Who's more likely and would you rather. Both answer at once. See if you match.", opts:[['sp','Questions',[4,6,8,10]]]},
+ {id:'fib',name:'Fib Detector',   em:'🕵️', blurb:'Write the truth plus two fibs. Your partner has to spot the real one.', opts:[['fib','Rounds each',[1,2,3]]]},
+ {id:'dr', name:'The Draft',      em:'🏈', blurb:'Take turns drafting from a top 10 list with the rankings hidden.', opts:[['dr','Lists',[2,4,6]]]},
+ {id:'sc', name:'On a Scale',     em:'🎚️', blurb:'Rate yourself 1 to 100 while your partner guesses your number, at the same time.', opts:[['sc','Questions each',[2,3,5]]]},
+];
+const DEFCFG={on:{km:1,top:1,p3:1,rk:1,sp:1,fib:1,dr:1,sc:1},km:2,top:1,topN:5,p3:1,rk:1,sp:4,fib:1,dr:2,sc:2,heat:'classic'};
+const BANKS={km:[KNOWME,KNOWME_X],top:[TOPLISTS,TOPLISTS_X],rk:[RANKS,RANKS_X],sc:[SCALES,SCALES_X],ml:[MORELIKELY,MORELIKELY_X],
+  wyr:[WYR,WYR_X],p3:[PICK3,PICK3_X],fib:[FIBS,FIBS_X],dr:[DRAFTS,DRAFTS_X]};
+const TOP_PTS={3:[100,70,40],5:[100,80,60,40,20]},MED=['🥇','🥈','🥉'],P3PTS=[150,100,75],DPTS=r=>(11-r)*10;
+
+const LS={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const PREF=Object.assign({sound:1,voice:0,name:''},LS.get('ccp_pref')||{});
+function savePref(){LS.set('ccp_pref',PREF)}
+const USED={};Object.keys(BANKS).forEach(k=>USED[k]=new Set((LS.get('ccp_used')||{})[k]||[]));
+function saveUsed(){const o={};for(const k in USED)o[k]=[...USED[k]];LS.set('ccp_used',o)}
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const plain=h=>String(h).replace(/<[^>]+>/g,'').replace(/&#39;/g,"'").replace(/&amp;/g,'&').replace(/&quot;/g,'"');
+const keyOf=x=>typeof x==='string'?x:x[0];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function shakeEl(el){if(!el)return;el.classList.remove('shake-it');void el.offsetWidth;el.classList.add('shake-it');setTimeout(()=>el.classList.remove('shake-it'),450)}
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1800)}
+function smartCase(s){
+  s=s.trim().replace(/\s+/g,' ');if(!s)return s;
+  const SMALL=new Set(['and','or','of','the','a','an','in','on','to','with','for','at','n']);
+  if(s===s.toLowerCase()||s===s.toUpperCase())return s.toLowerCase().split(' ').map((w,i)=>i>0&&SMALL.has(w)?w:w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+function sentenceCase(s){s=s.trim().replace(/\s+/g,' ').replace(/[.!]+$/,'');if(s===s.toUpperCase())s=s.toLowerCase();return s.charAt(0).toUpperCase()+s.slice(1)}
+
+/* =====================================================================
+   NETWORK STATE
+   ===================================================================== */
+let ROLE=null,ME=0,G=null,peer=null,conn=null,CODE=null,lastHeard=0,netOK=false,bc=null;
+const LOCAL=new URLSearchParams(location.search).has('local'); // two tabs on one computer, for testing
+const N=i=>esc(G.names[i]||('Player '+(i+1)));
+const tag=i=>`<span class="c${i}">${N(i)}</span>`;
+const OTHER=()=>1-ME;
+function fill(text,s){return esc(text).replace(/\{S\}/g,tag(s)).replace(/\{G\}/g,tag(1-s))}
+
+/* ---------- host side ---------- */
+function newG(){return{v:0,stage:'lobby',names:[PREF.name||'Player 1',''],cfg:Object.assign(JSON.parse(JSON.stringify(DEFCFG)),LS.get('ccp_cfg')||{}),
+  adult:[0,0],online:0,plan:[],ri:0,scores:[0,0],rp:[],rdy:[0,0],vote:[0,0],q:null,aw:[],awn:0,ev:{n:0},game:0}}
+function pool(name){const [c,x]=BANKS[name],h=G.cfg.heat;return h==='classic'?c:h==='spicy'?x:c.concat(x)}
+function draw(name,n){
+  const P=pool(name),used=USED[name];let c=P.filter(x=>!used.has(keyOf(x)));
+  if(c.length<n){P.forEach(x=>used.delete(keyOf(x)));c=P.slice()}
+  const pick=shuffle(c).slice(0,n);pick.forEach(x=>used.add(keyOf(x)));saveUsed();return pick;
+}
+function pickNew(name,cur){
+  const P=pool(name),used=USED[name],inPlay=new Set(G.q.qs.map(q=>keyOf(q.p)));inPlay.add(keyOf(cur));
+  let c=P.filter(x=>!used.has(keyOf(x))&&!inPlay.has(keyOf(x)));
+  if(!c.length){P.forEach(x=>used.delete(keyOf(x)));inPlay.forEach(k=>used.add(k));c=P.filter(x=>!inPlay.has(keyOf(x)))}
+  if(!c.length)return cur;const x=c[Math.random()*c.length|0];used.add(keyOf(x));saveUsed();return x;
+}
+function queue(items){const f=Math.random()<.5?0:1;return items.map((p,j)=>({p,s:(f+j)%2}))}
+const cur=()=>G.q&&G.q.qs[G.q.i];
+const rid=()=>G.plan[G.ri];
+// at = ms after the reveal screen opens, d = ms after the phone receives it
+function award(p,pts,o={}){G.awn++;G.aw.push(Object.assign({id:G.game+'_'+G.awn,p,pts},o));G.scores[p]+=pts;if(G.rp[G.ri])G.rp[G.ri][p]+=pts}
+function ev(type,data={}){G.ev=Object.assign({n:G.ev.n+1,type},data)}
+function commit(){G.v++;LS.set('ccp_host',{code:CODE,G});send({t:'state',G});renderAll()}
+function act(a){if(ROLE==='host'){handle(0,a);commit()}else send({t:'act',a})}
+
+function handle(p,a){
+  const it=cur();
+  switch(a.t){
+    case 'name':G.names[p]=String(a.v||'').slice(0,16)||('Player '+(p+1));return;
+    case 'adult':G.adult[p]=a.v?1:0;return;
+    case 'cfg':if(p===0&&G.stage==='lobby'){G.cfg=a.cfg;LS.set('ccp_cfg',G.cfg);if(G.cfg.heat==='classic')G.adult=[0,0]}return;
+    case 'start':if(p!==0)return;startGame();return;
+    case 'lobby':if(p!==0)return;G.stage='lobby';G.q=null;G.rdy=[0,0];G.adult=[0,0];return;
+    case 'ready':G.rdy[p]=1;if(G.rdy[0]&&G.rdy[1])advance();return;
+    case 'reroll':{
+      if(!it||!rerollable(it))return;G.vote[p]=G.vote[p]?0:1;
+      if(G.vote[0]&&G.vote[1]){const bank=rid()==='sp'?it.type:rid();it.p=pickNew(bank,it.p);ROUNDS[rid()].init(it);G.vote=[0,0];ev('reroll')}
+      return}
+    default:if(G.stage==='play'&&it)ROUNDS[rid()].act(p,a,it);
+  }
+}
+function startGame(){
+  G.game++;G.plan=RDEF.filter(r=>G.cfg.on[r.id]).map(r=>r.id);if(!G.plan.length)G.plan=['km'];
+  G.ri=0;G.scores=[0,0];G.rp=G.plan.map(()=>[0,0]);G.aw=[];G.stage='intro';G.rdy=[0,0];G.vote=[0,0];G.q=null;ev('curtain');
+}
+function advance(){
+  G.rdy=[0,0];G.vote=[0,0];
+  if(G.stage==='intro'){G.stage='play';G.aw=[];ROUNDS[rid()].start();ROUNDS[rid()].init(cur());return}
+  if(G.stage==='play'){
+    G.aw=[];
+    if(G.q.i<G.q.qs.length-1){G.q.i++;ROUNDS[rid()].init(cur());return}
+    if(G.ri<G.plan.length-1){G.ri++;G.stage='intro';G.q=null;ev('curtain');return}
+    G.stage='results';G.q=null;ev('curtain');return;
+  }
+  if(G.stage==='results'){startGame();return}
+}
+function rerollable(it){const r=rid();
+  if(['rev','done'].includes(it.ph))return false;
+  if(r==='dr'&&it.picks&&it.picks.length)return false;
+  if(r==='top'&&it.ph!=='list')return false;
+  return true;
+}
+
+/* ---------- transport ---------- */
+function send(m){
+  if(LOCAL){bc&&bc.postMessage(Object.assign({from:ROLE},m));return}
+  if(conn&&conn.open)try{conn.send(m)}catch(e){}
+}
+function onMsg(m){
+  lastHeard=Date.now();setNet(true);
+  if(ROLE==='host'){
+    if(m.t==='hello'){if(m.name)G.names[1]=String(m.name).slice(0,16);G.online=1;commit()}
+    else if(m.t==='act'){handle(1,m.a);commit()}
+  }else{
+    if(m.t==='state'){G=m.G;renderAll()}
+  }
+}
+function hostStart(code,resumeG){
+  ROLE='host';ME=0;CODE=code;G=resumeG||newG();G.names[0]=PREF.name||G.names[0];
+  if(LOCAL){bc=new BroadcastChannel('cc-'+code);bc.onmessage=e=>{if(e.data.from==='guest')onMsg(e.data)};setNet(false);commit();return}
+  if(!window.Peer){fatal('Could not load the connection library. Check your internet and reload.');return}
+  peer=new Peer(PREFIX+code,PEEROPTS);
+  peer.on('open',()=>{commit()});
+  peer.on('connection',c=>{
+    if(conn&&conn!==c)try{conn.close()}catch(e){}
+    conn=c;
+    c.on('open',()=>{G.online=1;setNet(true);commit()});
+    c.on('data',onMsg);
+    c.on('close',()=>{if(conn===c){G.online=0;setNet(false);commit()}});
+  });
+  peer.on('disconnected',()=>{setTimeout(()=>{try{peer.reconnect()}catch(e){}},1000)});
+  peer.on('error',e=>{
+    if(e.type==='unavailable-id'&&!resumeG){try{peer.destroy()}catch(x){}hostStart(makeCode());return}
+    if(e.type==='unavailable-id'){toast('That room is still open somewhere. Retrying...');setTimeout(()=>{try{peer.destroy()}catch(x){}hostStart(code,G)},3000);return}
+    if(e.type!=='peer-unavailable')toast('Connection hiccup: '+e.type);
+  });
+  commit();
+}
+function guestStart(code){
+  ROLE='guest';ME=1;CODE=code.toUpperCase();LS.set('ccp_guest',{code:CODE});
+  renderWaitJoin('Connecting to room '+CODE);
+  if(LOCAL){bc=new BroadcastChannel('cc-'+CODE);bc.onmessage=e=>{if(e.data.from==='host')onMsg(e.data)};send({t:'hello',name:PREF.name});return}
+  if(!window.Peer){fatal('Could not load the connection library. Check your internet and reload.');return}
+  peer=new Peer(PEEROPTS);
+  peer.on('open',()=>dial());
+  peer.on('disconnected',()=>{setTimeout(()=>{try{peer.reconnect()}catch(e){}},1000)});
+  peer.on('error',e=>{
+    if(e.type==='peer-unavailable'){renderWaitJoin(`Room ${CODE} isn't open yet. Retrying`);setTimeout(dial,2500);return}
+    toast('Connection hiccup: '+e.type);
+  });
+}
+function dial(){
+  if(!peer||peer.destroyed)return;
+  const c=peer.connect(PREFIX+CODE,{reliable:true});conn=c;
+  c.on('open',()=>{setNet(true);c.send({t:'hello',name:PREF.name})});
+  c.on('data',onMsg);
+  c.on('close',()=>{if(conn===c){setNet(false);setTimeout(dial,2000)}});
+}
+// heartbeat both ways so a sleeping phone shows up as offline
+setInterval(()=>{
+  if(!ROLE)return;send({t:'ping'});
+  if(ROLE==='host'&&G&&G.online&&Date.now()-lastHeard>12000&&!LOCAL){G.online=0;setNet(false);commit()}
+  if(ROLE==='guest'&&!LOCAL&&lastHeard&&Date.now()-lastHeard>12000&&netOK){setNet(false);try{conn&&conn.close()}catch(e){}setTimeout(dial,500)}
+},4000);
+const _onMsg=onMsg;onMsg=function(m){if(m.t==='ping'){lastHeard=Date.now();if(ROLE==='host'&&G&&!G.online){G.online=1;commit()}setNet(true);return}_onMsg(m)};
+function setNet(ok){netOK=ok;const p=$('#netpill');if(!p)return;p.classList.toggle('on',ok);
+  p.querySelector('b').textContent=ROLE?(ok?(CODE?'Room '+CODE:'Connected'):(ROLE==='host'?'Room '+CODE+' · partner offline':'Reconnecting')):'Offline';
+  $('#offline').classList.toggle('on',ROLE==='guest'&&!ok&&!!G&&!LOCAL);
+}
+function makeCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ';let s='';for(let i=0;i<4;i++)s+=A[Math.random()*A.length|0];return s}
+function fatal(m){stage.innerHTML=`<div class="card center"><div class="waitbox"><div class="spin">📡</div><div class="msg">Can't connect</div><div class="sub">${esc(m)}</div></div></div>`}
+function shareLink(){return location.origin+location.pathname+'?room='+CODE+(LOCAL?'&local=1':'')}
+
+/* =====================================================================
+   AUDIO + VOICE
+   ===================================================================== */
+let AC=null,NOISE=null;
+function ac(){if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;NOISE=b}
+  if(AC.state==='suspended')AC.resume();return AC}
+addEventListener('pointerdown',()=>{try{ac()}catch(e){}},{once:true});
+function tone(f,d,type='sine',v=.2,w=0,to=null){
+  if(!PREF.sound||!AC)return;const c=AC,t=c.currentTime+w,o=c.createOscillator(),g=c.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+d);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(c.destination);o.start(t);o.stop(t+d+.05);
+}
+function noise(d,v=.2,w=0,ftype='bandpass',freq=1000,q=1){
+  if(!PREF.sound||!AC)return;const c=AC,t=c.currentTime+w,s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();
+  s.buffer=NOISE;f.type=ftype;f.frequency.value=freq;f.Q.value=q;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  s.connect(f).connect(g).connect(c.destination);s.start(t,Math.random());s.stop(t+d+.05);
+}
+const SFX={
+  right(){[659,784,1047].forEach((f,i)=>tone(f,.28,'triangle',.22,i*.09))},
+  ding(){tone(1318,.5,'sine',.25);tone(1976,.4,'sine',.1,.02);noise(.3,.05,0,'highpass',7000)},
+  wrong(){tone(220,.55,'sawtooth',.14,0,90);tone(160,.55,'square',.09,0,70)},
+  strike(){tone(110,.7,'sawtooth',.2);tone(116,.7,'square',.14);noise(.4,.15,0,'lowpass',400)},
+  reveal(){tone(523,.14,'triangle',.15);tone(784,.3,'triangle',.15,.11)},
+  whoosh(){noise(.5,.14,0,'bandpass',600,.7);tone(250,.4,'sine',.06,0,1400)},
+  drum(){for(let i=0;i<22;i++)noise(.07,.05+i*.006,i*.055,'bandpass',1800,1.2);noise(.9,.18,1.25,'highpass',5000)},
+  tick(){tone(1100,.04,'square',.04)},
+  pop(){tone(600,.08,'sine',.12,0,1200)},
+  lock(){tone(300,.08,'square',.08);tone(450,.12,'square',.08,.07)},
+  reroll(){for(let i=0;i<6;i++)noise(.05,.08,i*.06,'bandpass',2500+i*200,3);tone(880,.15,'triangle',.1,.38)},
+  slide(){tone(300,1.5,'sine',.08,0,900)},
+  cymbal(){noise(1.4,.22,0,'highpass',6000)},
+  applause(){for(let i=0;i<70;i++)noise(.06,.03+Math.random()*.05,Math.random()*2.2,'bandpass',1500+Math.random()*2500,1.5)},
+  fanfare(){[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,i===5?.8:.18,'triangle',.2,i*.14));[262,330,392].forEach(f=>tone(f,1.2,'sawtooth',.04,.7));SFX.cymbal()},
+  aww(){tone(400,.9,'sine',.08,0,250);tone(500,.9,'sine',.06,.05,300)},
+  curtain(){noise(.7,.12,0,'lowpass',900)},
+  nudge(){tone(988,.12,'sine',.18);tone(1318,.2,'sine',.15,.12)},
+};
+let VOICE=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();VOICE=vs.find(v=>/en.US/i.test(v.lang)&&/Google|Samantha|Aaron|Daniel|Alex/i.test(v.name))||vs.find(v=>/^en/i.test(v.lang))||null}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(t){if(!PREF.voice||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(plain(t).replace(/[\u{1F300}-\u{1FAFF}☀-➿]/gu,''));if(VOICE)u.voice=VOICE;u.rate=1.05;speechSynthesis.speak(u)}catch(e){}}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+
+/* =====================================================================
+   VISUAL FX
+   ===================================================================== */
+const fx=$('#fx'),fxc=fx.getContext('2d'),bu=$('#burst'),buc=bu.getContext('2d');
+let amb=[],parts=[],burstOn=false;
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function sizeFx(){const dpr=Math.min(2,devicePixelRatio||1);[fx,bu].forEach(c=>{c.width=innerWidth*dpr;c.height=innerHeight*dpr});fxc.setTransform(dpr,0,0,dpr,0,0);buc.setTransform(dpr,0,0,dpr,0,0)}
+function seedAmb(){amb=Array.from({length:Math.min(70,innerWidth/10|0)},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:.6+Math.random()*2.4,s:.15+Math.random()*.5,tw:Math.random()*6.28,big:Math.random()<.12}))}
+function ambLoop(t){
+  fxc.clearRect(0,0,innerWidth,innerHeight);const sp=document.body.classList.contains('spicy');
+  for(const p of amb){p.y-=p.s*(sp?1.6:1);p.x+=Math.sin(t/2000+p.tw)*.2;p.tw+=.03;if(p.y<-20){p.y=innerHeight+20;p.x=Math.random()*innerWidth}
+    const a=.25+Math.sin(p.tw)*.25;
+    if(p.big){const g=fxc.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*9);g.addColorStop(0,sp?`rgba(255,80,120,${a*.5})`:`rgba(255,210,120,${a*.35})`);g.addColorStop(1,'rgba(0,0,0,0)');fxc.fillStyle=g;fxc.beginPath();fxc.arc(p.x,p.y,p.r*9,0,7);fxc.fill()}
+    else{fxc.fillStyle=sp?`rgba(255,140,90,${a+.2})`:`rgba(255,255,255,${a+.15})`;fxc.beginPath();fxc.arc(p.x,p.y,p.r,0,7);fxc.fill()}}
+  if(!REDUCE)requestAnimationFrame(ambLoop);
+}
+function burstLoop(){
+  buc.clearRect(0,0,innerWidth,innerHeight);parts=parts.filter(p=>p.life>0);
+  for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;p.vx*=p.dr;p.r+=p.vr;p.life--;
+    buc.save();buc.globalAlpha=Math.min(1,p.life/30);buc.translate(p.x,p.y);buc.rotate(p.r);
+    if(p.e){buc.font=`${p.w*2}px serif`;buc.fillText(p.e,-p.w,p.w)}else if(p.spark){buc.fillStyle=p.c;buc.beginPath();buc.arc(0,0,p.w/2,0,7);buc.fill()}
+    else{buc.fillStyle=p.c;buc.fillRect(-p.w/2,-p.h/2,p.w,p.h*Math.abs(Math.cos(p.r*2)))}buc.restore()}
+  if(parts.length)requestAnimationFrame(burstLoop);else{burstOn=false;buc.clearRect(0,0,innerWidth,innerHeight)}
+}
+function kick(){if(!burstOn){burstOn=true;requestAnimationFrame(burstLoop)}}
+const COLS=['#ffd23f','#ff3d7f','#2fd6ff','#ffffff','#2ee59d'];
+function confetti(n=220){if(REDUCE)return;const sp=document.body.classList.contains('spicy');
+  for(let i=0;i<n;i++)parts.push({x:Math.random()*innerWidth,y:-20-Math.random()*innerHeight*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*4,g:.03,dr:.995,
+    r:Math.random()*6.28,vr:(Math.random()-.5)*.3,w:6+Math.random()*7,h:8+Math.random()*10,c:COLS[Math.random()*5|0],life:240+Math.random()*80,
+    e:sp&&Math.random()<.2?['🌶️','💋','🔥','🍑','😈'][Math.random()*5|0]:null});kick()}
+function sparkle(x,y,n=40,cols=COLS){if(REDUCE)return;for(let i=0;i<n;i++){const a=Math.random()*6.28,v=2+Math.random()*6;parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-2,g:.12,dr:.97,r:0,vr:0,w:3+Math.random()*4,h:0,c:cols[Math.random()*cols.length|0],life:50+Math.random()*30,spark:1})}kick()}
+function sparkleAt(el,n,cols){if(!el)return;const r=el.getBoundingClientRect();sparkle(r.left+r.width/2,r.top+r.height/2,n,cols)}
+function flash(){const f=$('#flash');f.classList.remove('on');void f.offsetWidth;f.classList.add('on')}
+function hype(text,bad){const h=$('#hype');h.innerHTML=`<span class="${bad?'bad':''}">${esc(text)}</span>`;void h.offsetWidth;h.firstChild.classList.add('on')}
+function shakeScreen(){const w=$('.wrap');w.classList.remove('shake');void w.offsetWidth;w.classList.add('shake')}
+function curtainFx(){const c=$('#curtain');SFX.curtain();c.classList.add('closed');setTimeout(()=>{c.classList.remove('closed');SFX.curtain()},900)}
+function bigWin(text){flash();hype(text);SFX.applause();confetti(140);buzz([30,40,60])}
+function bigX(n){const x=$('#bigx');x.innerHTML='<span>'+'✕'.repeat(n)+'</span>';x.classList.remove('on');void x.offsetWidth;x.classList.add('on');SFX.strike();shakeScreen();buzz(200)}
+
+/* =====================================================================
+   RENDER LOOP
+   ===================================================================== */
+let curKey=null,curView=null,T0=0,lastEvN=null,lastGame=null,lastStage=null;
+const fired=new Set(),sched=new Set(),onceSet=new Set();
+// true the first time a screen is built, and stays true while that same screen is still up
+function once(k){if(!onceSet.has(k)){onceSet.add(k);return true}return curKey===k}
+function renderAll(){
+  if(!G)return;
+  document.body.classList.toggle('spicy',G.cfg.heat!=='classic');
+  if(lastGame!==G.game){lastGame=G.game;fired.clear();sched.clear();G.aw.forEach(a=>{if(G.stage!=='play')fired.add(a.id)})}
+  const v=buildView();
+  if(v.key!==curKey){curKey=v.key;curView=v;T0=performance.now();stage.innerHTML=v.html;if(v.mount)v.mount();if(v.scroll!==false)window.scrollTo({top:0,behavior:'smooth'})}
+  else{curView=v;if(v.patch)v.patch()}
+  paintVote(v);paintReady(v);playEvents();runAwards();paintBoard();setNet(netOK||LOCAL&&G.online);
+  if(lastStage!==G.stage){if(G.stage==='lobby'&&lastStage)curtainFx();lastStage=G.stage}
+}
+function playEvents(){
+  if(lastEvN===null){lastEvN=G.ev.n;return}
+  if(G.ev.n===lastEvN)return;lastEvN=G.ev.n;const e=G.ev;
+  if(e.type==='curtain')curtainFx();
+  if(e.type==='reroll'){SFX.reroll();toast('🎲 Rerolled!');buzz(60)}
+  if(e.type==='hit'){SFX.ding();sparkleAt($('#t'+e.k),30)}
+  if(e.type==='strike')bigX(e.n);
+  if(e.type==='dup'){SFX.wrong()}
+  if(e.type==='judge'){SFX.nudge();buzz([40,60,40])}
+  if(e.type==='pick'){SFX.pop();sparkleAt($(`.dcard[data-v="${CSS.escape(e.v)}"]`),22,[e.p?'#2fd6ff':'#ff3d7f','#fff']);if(e.p!==ME)buzz(50)}
+  if(e.type==='lock'&&e.p!==ME){SFX.lock()}
+  if(e.type==='vote'&&e.p!==ME){SFX.nudge();buzz([30,50,30])}
+}
+// scores animate in as each reveal moment happens
+function runAwards(){
+  for(const a of G.aw){
+    if(fired.has(a.id)||sched.has(a.id))continue;sched.add(a.id);
+    const delay=a.d!=null?a.d:Math.max(0,a.at-(performance.now()-T0));
+    setTimeout(()=>{fired.add(a.id);fireAward(a);paintBoard()},delay);
+  }
+}
+const streak=[0,0];
+function fireAward(a){
+  if(a.miss){streak[a.p]=0;if(a.p===ME&&a.aww)SFX.aww()}
+  if(a.big){bigWin(a.big);speak(a.big)}
+  if(a.bad){hype(a.bad,1);SFX.aww();shakeScreen();speak(a.bad)}
+  if(!a.pts)return;
+  if(a.pts>0&&!a.quiet){streak[a.p]++;if(streak[a.p]===3)setTimeout(()=>{hype('🔥 On fire!');SFX.cymbal()},500)}
+  const pod=$('#pod'+a.p);pod.classList.remove('bump');void pod.offsetWidth;pod.classList.add('bump');
+  const fl=document.createElement('div');fl.className='float';fl.textContent=(a.pts>0?'+':'')+a.pts;fl.style.color=a.pts>0?'var(--ok)':'var(--bad)';pod.appendChild(fl);setTimeout(()=>fl.remove(),1400);
+  if(a.pts>0&&!a.quiet)sparkleAt(pod,24,[a.p?'#2fd6ff':'#ff3d7f','#ffd23f','#fff']);
+  if(a.p===ME&&a.pts>0)buzz(25);
+}
+function shownScore(i){let s=G.scores[i];for(const a of G.aw)if(a.p===i&&!fired.has(a.id))s-=a.pts;return s}
+function paintBoard(){
+  const on=['intro','play','results'].includes(G.stage);$('#board').style.display=on?'grid':'none';if(!on)return;
+  const sc=[shownScore(0),shownScore(1)];
+  [0,1].forEach(k=>{const p=$('#pod'+k);p.querySelector('.pname').textContent=G.names[k]||('Player '+(k+1));
+    const el=p.querySelector('.score');if(+el.textContent!==sc[k])countTo(el,+el.textContent||0,sc[k]);
+    p.querySelector('.you').textContent=k===ME?'YOU':'';
+    p.classList.toggle('leader',sc[0]!==sc[1]&&(k===0?sc[0]>sc[1]:sc[1]>sc[0])&&Math.max(...sc)>0);
+    p.classList.toggle('hot',streak[k]>=3);p.querySelector('.streak').textContent=`🔥 x${streak[k]}`;
+    const st=curView&&curView.status?curView.status[k]:'';const s=p.querySelector('.st');s.textContent=st||'';s.className='st '+(st&&st.startsWith('✓')?'ok':'wait');
+    p.classList.toggle('active',!!(curView&&curView.turn===k));
+  });
+  const rt=$('#roundtag');
+  rt.innerHTML=G.stage==='results'?'Final<br>Scores':G.plan.length?`Round ${G.ri+1}<br>${esc(RDEF.find(r=>r.id===rid()).name)}`:'';
+}
+function countTo(el,a,b){const t0=performance.now();const f=n=>{const k=Math.min(1,(n-t0)/650);el.textContent=Math.round(a+(b-a)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
+
+/* ---------- shared view pieces ---------- */
+function pips(i,n){return `<div class="pips">${Array.from({length:n},(_,k)=>`<i class="${k<i?'done':k===i?'cur':''}"></i>`).join('')}</div>`}
+function meta(chip,cls=''){const n=G.q.qs.length;return `<div class="meta">${pips(G.q.i,n)}${chip?`<span class="chip-pts ${cls}">${chip}</span>`:''}</div>`}
+const REROLL=`<button class="reroll" id="reroll"><span class="die">🎲</span><span class="rl">Reroll</span></button>`;
+function card(html,reroll){return `<div class="card${reroll?' rr-pad':''}">${reroll?REROLL:''}${html}</div>`}
+function waitBox(emoji,msg,sub=''){return `<div class="waitbox"><div class="spin">${emoji}</div><div class="msg dots">${msg}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`}
+function paintVote(v){
+  const it=G.stage==='play'&&cur(),can=it&&rerollable(it);
+  const b=$('#reroll'),bar=$('#votebar');
+  if(b){b.style.display=can?'':'none';const mine=G.vote[ME],theirs=G.vote[OTHER()];
+    b.classList.toggle('voted',!!mine);b.classList.toggle('asked',!mine&&!!theirs);
+    b.querySelector('.rl').textContent=mine?'Voted (1/2)':theirs?'Agree to reroll':'Reroll';
+    b.onclick=()=>{act({t:'reroll'});SFX.tick()}}
+  const show=can&&G.vote[OTHER()]&&!G.vote[ME];
+  bar.classList.toggle('on',!!show);
+  if(show){bar.innerHTML=`<span>🎲 ${N(OTHER())} wants a new question</span><button class="btn" id="vagree">Reroll it</button>`;$('#vagree').onclick=()=>act({t:'reroll'})}
+}
+function paintReady(v){
+  const c=$('#ctl');if(!c)return;
+  if(!v.ready){c.innerHTML='';return}
+  const show=()=>{const c=$('#ctl');if(!c||curView!==v&&curView.key!==v.key)return;
+    const mine=G.rdy[ME],theirs=G.rdy[OTHER()];
+    const lbl=mine?`Waiting for ${N(OTHER())}`:`${v.ready}${theirs?' (1/2)':''} ▸`;
+    const h=`<div class="readyrow"><button class="btn ${mine?'waiting':''}" id="next" ${mine?'disabled':''}>${lbl}</button></div>`;
+    if(c.dataset.h!==h){c.innerHTML=h;c.dataset.h=h;const n=$('#next');if(n&&!mine)n.onclick=()=>{act({t:'ready'});SFX.tick()}}};
+  const wait=(v.readyAt||0)-(performance.now()-T0);
+  if(wait>0){c.innerHTML='';c.dataset.h='';setTimeout(()=>{if(curKey===v.key)show()},wait)}else show();
+}
+
+/* =====================================================================
+   VIEWS
+   ===================================================================== */
+function buildView(){
+  if(G.stage==='lobby')return ROLE==='host'?viewHostLobby():viewGuestLobby();
+  if(G.stage==='intro')return viewIntro();
+  if(G.stage==='results')return viewResults();
+  const it=cur();return ROUNDS[rid()].view(it);
+}
+/* ---------- landing ---------- */
+function renderLanding(){
+  ROLE=null;document.body.classList.remove('spicy');$('#board').style.display='none';
+  const qs=new URLSearchParams(location.search),room=(qs.get('room')||'').toUpperCase();
+  const saved=LS.get('ccp_host'),gsaved=LS.get('ccp_guest');
+  const canResume=saved&&saved.G&&saved.G.stage!=='lobby'&&!room;
+  stage.innerHTML=`<div class="card land">
+    <h2 class="sec">Your name</h2>
+    <div class="inrow" style="max-width:420px"><input id="me" type="text" maxlength="16" placeholder="Your name" value="${esc(PREF.name)}" style="text-align:center"></div>
+    ${room?`<h2 class="sec">You've been invited</h2><div class="roomcode">${esc(room)}</div><div class="big2"><button class="btn huge" id="joinlink">Join the game</button></div>`
+    :`<div class="big2"><button class="btn huge" id="host">🎬 Host a game</button></div>
+      <h2 class="sec">Or join one</h2>
+      <div class="codebox"><input id="code" type="text" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters" value="${gsaved&&gsaved.code?esc(gsaved.code):''}"><button class="btn" id="join">Join</button></div>`}
+    ${canResume?`<div class="resume"><b>Game in progress in room ${esc(saved.code)}</b><div class="row" style="margin-top:8px"><button class="btn small" id="resume">Resume hosting</button><button class="btn ghost small" id="discard">Discard</button></div></div>`:''}
+    <div class="hint">One phone hosts, the other joins with the code. Both phones need to be online.</div></div>`;
+  const nm=()=>{const v=$('#me').value.trim();if(!v){shakeEl($('#me'));$('#me').focus();return null}PREF.name=v.slice(0,16);savePref();return v};
+  if(room){$('#joinlink').onclick=()=>{if(nm())guestStart(room)}}
+  else{
+    $('#host').onclick=()=>{if(nm()){LS.del('ccp_host');hostStart(makeCode())}};
+    const j=()=>{const c=$('#code').value.trim().toUpperCase();if(c.length!==4){shakeEl($('#code'));return}if(nm())guestStart(c)};
+    $('#join').onclick=j;$('#code').onkeydown=e=>{if(e.key==='Enter')j()};
+  }
+  if(canResume){$('#resume').onclick=()=>{if(nm()){const s=LS.get('ccp_host');hostStart(s.code,s.G)}};$('#discard').onclick=()=>{LS.del('ccp_host');renderLanding()}}
+}
+function renderWaitJoin(msg){stage.innerHTML=`<div class="card center">${waitBox('📡',msg)}<div class="row"><button class="btn ghost small" id="cancel">Cancel</button></div></div>`;$('#cancel').onclick=()=>{location.href=location.pathname+(LOCAL?'?local=1':'')}}
+
+/* ---------- lobby ---------- */
+function heatHTML(c,enabled){return `<div class="heat">${[['classic','😇','Classic','Family friendly'],['mixed','🌶️','Mixed','Some spice'],['spicy','🔥','After Dark','Explicit, 18+']].map(([h,e,b,s])=>
+  `<button data-h="${h}" class="${c.heat===h?'on':''}" ${enabled?'':'disabled'}><span class="em">${e}</span><b>${b}</b><small>${s}</small></button>`).join('')}</div>`}
+function adultHTML(){return `<label class="adult" id="adultbox"><input type="checkbox" id="adult" ${G.adult[ME]?'checked':''}><span>I'm 18+ and I'm in for explicit questions</span><span class="two" id="adultcount">${G.adult[0]+G.adult[1]}/2 agreed</span></label>`}
+function viewHostLobby(){
+  const c=G.cfg;
+  return{key:'lobby-host',html:`<div class="card center">
+    <h2 class="sec">Room code</h2><div class="roomcode">${CODE}</div>
+    <div class="row" style="margin-top:6px"><button class="btn small" id="share">📲 Send invite link</button></div>
+    <div class="lobbystat"><span class="ok">✓ ${N(0)} (you)</span><span id="pstat"></span></div>
+    <h2 class="sec">How spicy?</h2>${heatHTML(c,true)}<div id="adultwrap"></div>
+    <h2 class="sec">Pick your rounds</h2>
+    <div class="rgrid">${RDEF.map((r,k)=>`<div class="rcard${c.on[r.id]?' on':''}" data-id="${r.id}"><span class="rem">${r.em}</span>
+      <b>${k+1} · ${r.name}</b><p>${r.blurb}</p>
+      <div class="ro">${r.opts.map(([key,lab,vals])=>`<label>${lab}<select data-k="${key}">${vals.map(v=>`<option value="${v}"${c[key]==v?' selected':''}>${key==='topN'?'Top '+v:v}</option>`).join('')}</select></label>`).join('')}
+      <button class="only" data-only="${r.id}">Only this</button></div></div>`).join('')}</div>
+    <div class="row"><button class="btn ghost small" id="all">Select all</button></div>
+    <div class="row"><button class="btn huge" id="go">🎬 Start the show</button></div><div class="hint" id="gohint"></div></div>`,
+    mount(){
+      const push=()=>{const on={};stage.querySelectorAll('.rcard').forEach(el=>on[el.dataset.id]=el.classList.contains('on')?1:0);
+        const cfg=Object.assign({},G.cfg,{on});stage.querySelectorAll('select[data-k]').forEach(s=>cfg[s.dataset.k]=+s.value);act({t:'cfg',cfg})};
+      stage.querySelectorAll('.heat button').forEach(b=>b.onclick=()=>{stage.querySelectorAll('.heat button').forEach(x=>x.classList.toggle('on',x===b));
+        const cfg=Object.assign({},G.cfg,{heat:b.dataset.h});act({t:'cfg',cfg});SFX.pop();sparkleAt(b,24)});
+      stage.querySelectorAll('.rcard').forEach(el=>el.onclick=e=>{if(e.target.closest('select,label,.only'))return;el.classList.toggle('on');SFX.tick();push()});
+      stage.querySelectorAll('select[data-k]').forEach(s=>s.onchange=push);
+      stage.querySelectorAll('.only').forEach(b=>b.onclick=()=>{stage.querySelectorAll('.rcard').forEach(el=>el.classList.toggle('on',el.dataset.id===b.dataset.only));push()});
+      $('#all').onclick=()=>{stage.querySelectorAll('.rcard').forEach(el=>el.classList.add('on'));push()};
+      $('#share').onclick=async()=>{const url=shareLink();try{if(navigator.share){await navigator.share({title:"Couple's Clash",text:`Join my game! Room ${CODE}`,url});return}}catch(e){}
+        try{await navigator.clipboard.writeText(url);toast('Invite link copied')}catch(e){prompt('Copy this link',url)}};
+      $('#go').onclick=()=>{if(!canStart()){shakeEl($('#go'));return}act({t:'start'})};
+      this.patch();
+    },
+    patch(){
+      $('#pstat').className=G.online?'ok':'';$('#pstat').innerHTML=G.online?`✓ ${N(1)} joined`:'<span class="dots">Waiting for your partner</span>';
+      const aw=$('#adultwrap');
+      if(G.cfg.heat!=='classic'){if(!$('#adultbox')){aw.innerHTML=adultHTML();$('#adult').onchange=e=>act({t:'adult',v:e.target.checked})}$('#adultcount').textContent=`${G.adult[0]+G.adult[1]}/2 agreed`;$('#adult').checked=!!G.adult[0]}
+      else aw.innerHTML='';
+      $('#go').disabled=!canStart();
+      $('#gohint').textContent=!G.online?'Your partner needs to join first.':G.cfg.heat!=='classic'&&!(G.adult[0]&&G.adult[1])?'Both of you need to tick the 18+ box.':!Object.values(G.cfg.on).some(Boolean)?'Pick at least one round.':'';
+    }};
+}
+function canStart(){return G.online&&(G.cfg.heat==='classic'||G.adult[0]&&G.adult[1])&&Object.values(G.cfg.on).some(Boolean)}
+function viewGuestLobby(){
+  const c=G.cfg,rounds=RDEF.filter(r=>c.on[r.id]);
+  return{key:'lobby-guest',html:`<div class="card center">
+    <h2 class="sec">You're in room</h2><div class="roomcode">${CODE}</div>
+    <div class="lobbystat"><span class="ok">✓ ${N(0)} (host)</span><span class="ok">✓ ${N(1)} (you)</span></div>
+    <div id="gsum"></div><div id="adultwrap"></div>
+    ${waitBox('🎬',`Waiting for ${N(0)} to start`,`${N(0)} picks the rounds and spice level.`)}</div>`,
+    mount(){this.patch()},
+    patch(){
+      const c=G.cfg,rounds=RDEF.filter(r=>c.on[r.id]);
+      const h=`<div class="summary"><div><span>Spice level</span><span>${c.heat==='classic'?'😇 Classic':c.heat==='mixed'?'🌶️ Mixed':'🔥 After Dark'}</span></div>
+        <div><span>Rounds</span><span>${rounds.length}</span></div>${rounds.map(r=>`<div><span>${r.em} ${r.name}</span><span></span></div>`).join('')}</div>`;
+      if($('#gsum').dataset.h!==h){$('#gsum').innerHTML=h;$('#gsum').dataset.h=h}
+      const aw=$('#adultwrap');
+      if(c.heat!=='classic'){if(!$('#adultbox')){aw.innerHTML=adultHTML();$('#adult').onchange=e=>act({t:'adult',v:e.target.checked})}$('#adultcount').textContent=`${G.adult[0]+G.adult[1]}/2 agreed`;$('#adult').checked=!!G.adult[1]}
+      else aw.innerHTML='';
+    }};
+}
+
+/* ---------- intro + results ---------- */
+const RULES={
+  km:{desc:()=>`You both see the same question. The subject answers for real, the other guesses what they'll say, at the same time. The subject judges the match.`,chips:['🎯 Nailed it +200','🤏 Close +100']},
+  top:{desc:()=>`One of you lists your top ${G.cfg.topN}. The other uncovers the board by guessing. The list owner rules on close calls from their own phone. Three strikes ends the turn.`,chips:()=>[`#1 is worth ${TOP_PTS[G.cfg.topN][0]}`,'Clear the board +100','❌❌❌ = out']},
+  p3:{desc:()=>`Pick your top 3 from the list or write in your own. Your partner has to find all three hiding in a lineup.`,chips:['🥇 +150','🥈 +100','🥉 +75','Exact spot +50']},
+  rk:{desc:()=>`Same list on both phones. The subject drags their real order while the other drags their guess, at the same time.`,chips:['Exact spot +60','One off +20','Perfect +100 bonus']},
+  sp:{desc:()=>`Both answer every question at the same time. Who's more likely: match and you both score. Would you rather: predict your partner's pick.`,chips:['Match +100 each','Right prediction +100']},
+  fib:{desc:()=>`Write one true answer about yourself and two convincing fibs. Your partner has to sniff out the truth.`,chips:['Spot the truth +200','Fool them +150']},
+  dr:{desc:()=>`Ten items, hidden rankings. Take turns drafting on your own phones. First pick alternates every list.`,chips:()=>['#1 = 100','#10 = 10',G.cfg.heat==='classic'?'Real rankings':'Spicy lists use each other\'s secret ranking']},
+  sc:{desc:()=>`The subject rates themselves 1 to 100 while the other guesses the number, at the same time.`,chips:['Within 3 +300','Within 10 +200','Within 20 +100','Last one doubles']},
+};
+function viewIntro(){
+  const id=rid(),def=RDEF.find(r=>r.id===id),Rd=RULES[id],chips=typeof Rd.chips==='function'?Rd.chips():Rd.chips;
+  const title=def.name.split('').map((ch,i)=>`<span style="animation-delay:${.25+i*.04}s">${ch===' '?'&nbsp;':esc(ch)}</span>`).join('');
+  return{key:'intro|'+G.game+'|'+G.ri,ready:"I'm ready",html:`<div class="card intro">
+    <div class="medal-r"><span>${G.ri+1}</span><small>OF ${G.plan.length}</small><i class="rem2">${def.em}</i></div>
+    <div class="bigtitle">${title}</div>
+    ${G.cfg.heat!=='classic'?`<div class="spicytag">${G.cfg.heat==='spicy'?'🔥 After Dark edition':'🌶️ Spicy questions mixed in'}</div>`:''}
+    <p class="lead">${Rd.desc()}</p><div class="rules-chips">${chips.map(c=>`<span>${c}</span>`).join('')}</div>
+    <div class="row" id="ctl"></div></div>`,
+    status:[G.rdy[0]?'✓ ready':'',G.rdy[1]?'✓ ready':''],
+    mount(){setTimeout(()=>{SFX.fanfare();sparkleAt($('.medal-r'),60)},350);speak(`Round ${G.ri+1}. ${def.name}!`)}};
+}
+function viewResults(){
+  const [a,b]=G.scores,tie=a===b,w=a>b?0:1,max=Math.max(1,...G.rp.flat().map(Math.abs));
+  return{key:'results|'+G.game,ready:'Rematch',html:`<div class="card center">
+    <div class="trophy">${tie?'🤝':'🏆'}</div>
+    <div class="bigtitle">${tie?"It's a tie!":`${N(w)} wins!`}</div>
+    <p class="lead">${tie?'Clearly a perfect match.':`Knows their partner best. ${tag(1-w)} owes them a favor of their choosing.`}</p>
+    <div class="finals"><div class="c0">${N(0)}<span>${a}</span></div><div class="c1">${N(1)}<span>${b}</span></div></div>
+    <div class="recap">${G.plan.map((id,k)=>{const d=RDEF.find(r=>r.id===id);return `<div class="rrow"><span class="rname">${d.em} ${d.name}</span><div class="bars">
+      ${[0,1].map(i=>`<div class="bar b${i}" data-w="${Math.max(0,G.rp[k][i])/max*80}"><em>${G.rp[k][i]}</em></div>`).join('')}</div></div>`}).join('')}</div>
+    <div class="row" id="ctl"></div>${ROLE==='host'?`<div class="row"><button class="btn ghost small" id="tolobby">Change rounds or spice</button></div>`:''}</div>`,
+    status:[G.rdy[0]?'✓ rematch':'',G.rdy[1]?'✓ rematch':''],
+    mount(){setTimeout(()=>stage.querySelectorAll('.bar').forEach(x=>x.style.width=x.dataset.w+'%'),300);
+      SFX.fanfare();SFX.applause();confetti(300);setTimeout(()=>confetti(180),1800);speak(tie?"It's a tie!":`And the winner is ${G.names[w]}!`);
+      const tl=$('#tolobby');if(tl)tl.onclick=()=>act({t:'lobby'})}};
+}
+
+/* ---------- small widgets ---------- */
+function lockedView(key,it,msg,sub){return{key,html:card(waitBox('🔒',msg,sub),1),status:it.__st}}
+function statusOf(arr,labelDone='✓ locked',labelWait='answering…'){return [0,1].map(i=>arr[i]!=null?labelDone:labelWait)}
+function rkBoard(items){
+  const n=items.length;
+  return `<div class="rk-wrap"><div class="rk-end">❤️ Favorite</div>
+    <div class="rk${n>6?' compact':''}" id="rk" style="--n:${n}">
+      ${items.map((_,k)=>`<div class="rk-slot" style="--k:${k};--t:${n>1?k/(n-1):0}"><span class="rk-badge">${k+1}</span><span class="rk-hole"></span></div>`).join('')}
+      ${items.map(([e,t])=>`<div class="rk-tile" data-v="${esc(t)}"><span class="rk-emo">${e}</span><span class="rk-txt">${esc(t)}</span>
+        <span class="rk-arrows"><button data-m="-1">▲</button><button data-m="1">▼</button></span><span class="rk-grip">⠿</span></div>`).join('')}
+    </div><div class="rk-end">👎 Least favorite</div><div class="hint">Drag the tiles or use the arrows</div></div>`;
+}
+function rkDrag(root){
+  const n=root.children.length/2;let order=[...root.querySelectorAll('.rk-tile')];
+  const step=()=>{const cs=getComputedStyle(root);return parseFloat(cs.getPropertyValue('--h'))+parseFloat(cs.getPropertyValue('--g'))};
+  const layout=skip=>{const st=step();order.forEach((t,k)=>{t.style.setProperty('--t',n>1?k/(n-1):0);if(t!==skip)t.style.top=k*st+'px'})};
+  root._layout=()=>layout();order.forEach(t=>{t.style.top='0px';t.style.opacity=0});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{order.forEach((t,k)=>{t.style.transitionDelay=k*50+'ms';t.style.opacity=1});layout();setTimeout(()=>order.forEach(t=>t.style.transitionDelay=''),800)}));
+  let d=null;
+  root.addEventListener('pointerdown',e=>{const t=e.target.closest('.rk-tile');if(!t||e.target.closest('button'))return;e.preventDefault();t.setPointerCapture(e.pointerId);d={t,y0:e.clientY,top0:order.indexOf(t)*step()};t.classList.add('drag')});
+  root.addEventListener('pointermove',e=>{if(!d)return;const st=step();const top=Math.max(-st*.35,Math.min((n-1)*st+st*.35,d.top0+e.clientY-d.y0));d.t.style.top=top+'px';
+    const tgt=Math.max(0,Math.min(n-1,Math.round(top/st))),c=order.indexOf(d.t);if(tgt!==c){order.splice(c,1);order.splice(tgt,0,d.t);layout(d.t);SFX.tick();buzz(8)}});
+  const end=()=>{if(!d)return;d.t.classList.remove('drag');d=null;layout()};
+  root.addEventListener('pointerup',end);root.addEventListener('pointercancel',end);
+  root.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const t=b.closest('.rk-tile'),i=order.indexOf(t),j=i+ +b.dataset.m;if(j<0||j>=n)return;order.splice(i,1);order.splice(j,0,t);layout();SFX.tick()});
+  return ()=>order.map(t=>t.dataset.v);
+}
+addEventListener('resize',()=>{$('#rk')?._layout?.();window._redraw&&window._redraw()});
+function p3Mount(el,opts,c,custom){
+  const sel=[];
+  el.innerHTML=`<div class="p3slots" id="p3s"></div><div class="chips" id="p3c"></div>${custom?`<div class="p3custom" id="p3cu"></div>`:''}`;
+  const addBtn=()=>{$('#p3cu').innerHTML=`<button class="chip add" id="p3add">✏️ Write your own</button>`;$('#p3add').onclick=openAdd};
+  const openAdd=()=>{$('#p3cu').innerHTML=`<div class="inrow"><input id="p3in" type="text" maxlength="32" autocomplete="off" placeholder="Type your own"><button class="btn small" id="p3ok">Add</button></div>`;
+    const inp=$('#p3in');inp.focus();
+    const ok=()=>{const v=smartCase(inp.value);if(!v){shakeEl(inp);return}let idx=opts.findIndex(o=>o.toLowerCase()===v.toLowerCase());if(idx<0){opts.push(v);idx=opts.length-1}
+      if(!sel.includes(idx)){if(sel.length<3)sel.push(idx);else shakeEl($('#p3s'))}SFX.pop();addBtn();paint()};
+    $('#p3ok').onclick=ok;inp.onkeydown=e=>{if(e.key==='Enter')ok()}};
+  const paint=()=>{
+    $('#p3s').innerHTML=[0,1,2].map(k=>`<button class="p3slot ${sel[k]!=null?'on':''}" data-k="${k}" style="--c:var(--p${c})"><span class="medal">${MED[k]}</span><span class="st">${sel[k]!=null?esc(opts[sel[k]]):(k===sel.length?'Tap your #'+(k+1):'·')}</span></button>`).join('');
+    $('#p3c').innerHTML=opts.map((o,i)=>{const r=sel.indexOf(i);return `<button class="chip ${r>=0?'sel':''}" data-i="${i}" style="--c:var(--p${c})">${r>=0?MED[r]:''}${esc(o)}</button>`}).join('');
+    $('#p3s').querySelectorAll('.p3slot').forEach(b=>b.onclick=()=>{const k=+b.dataset.k;if(sel[k]!=null){sel.splice(k,1);SFX.tick();paint()}});
+    $('#p3c').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,r=sel.indexOf(i);
+      if(r>=0)sel.splice(r,1);else if(sel.length<3){sel.push(i);sparkleAt(b,12,[c?'#2fd6ff':'#ff3d7f','#fff'])}else{shakeEl($('#p3s'));return}SFX.pop();paint()});
+  };
+  if(custom)addBtn();paint();return ()=>sel.length===3?sel.map(i=>opts[i]):null;
+}
+function dialHTML(it,c){return `<div class="dialwrap" style="--c:var(--p${c})"><div class="bignum" id="num">50</div>
+  <input type="range" class="dial" id="dial" min="1" max="100" value="50">
+  <div class="ends"><div><b>1</b>${esc(it.p[1])}</div><div><b>100</b>${esc(it.p[2])}</div></div>
+  <div class="nudge"><button class="btn ghost" data-d="-5">-5</button><button class="btn ghost" data-d="-1">-1</button><button class="btn ghost" data-d="1">+1</button><button class="btn ghost" data-d="5">+5</button></div></div>`}
+function wireDial(){const d=$('#dial'),n=$('#num');let lt=0;d.oninput=()=>{n.textContent=d.value;const t=performance.now();if(t-lt>45){SFX.tick();lt=t}};
+  stage.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{d.value=Math.min(100,Math.max(1,+d.value+ +b.dataset.d));n.textContent=d.value;SFX.tick()});return d}
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/&/g,' and ').replace(/\bn\b/g,'and').replace(/[^a-z0-9 ]+/g,' ').replace(/\b(the|a|an|my)\b/g,' ').split(/\s+/).filter(Boolean)
+  .map(w=>w.length>3&&w.endsWith('ies')?w.slice(0,-3)+'y':(w.length>3&&w.endsWith('s')&&!w.endsWith('ss')?w.slice(0,-1):w)).join(' ')}
+function lev(a,b){const m=a.length,n=b.length;let prev=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(prev[j]+1,c[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=c}return prev[n]}
+function fuzzy(g,a){const x=norm(g),y=norm(a);if(!x||!y)return false;if(x===y||x.replace(/ /g,'')===y.replace(/ /g,''))return true;
+  const has=(h,nd)=>nd.length>=4&&(' '+h+' ').includes(' '+nd+' ');if(has(y,x)||has(x,y))return true;const L=Math.max(x.length,y.length),tol=L>=8?2:L>=4?1:0;return tol>0&&lev(x,y)<=tol}
+
+/* =====================================================================
+   ROUNDS (host runs start/init/act, both phones run view)
+   ===================================================================== */
+const ROUNDS={};
+const Q=()=>`${G.game}|${G.ri}|${G.q.i}`;
+
+/* ---------- 1. Know Me Best (simultaneous) ---------- */
+ROUNDS.km={
+  start(){G.q={qs:queue(draw('km',G.cfg.km*2)),i:0}},
+  init(it){it.ph='ans';it.a=[null,null];it.j=null},
+  act(p,a,it){
+    if(a.t==='km_ans'&&it.ph==='ans'&&it.a[p]==null){it.a[p]=String(a.v).slice(0,90);ev('lock',{p});if(it.a[0]!=null&&it.a[1]!=null){it.ph='rev';ev('rev')}}
+    if(a.t==='km_judge'&&it.ph==='rev'&&p===it.s){const g=1-it.s,pts=[0,100,200].includes(a.v)?a.v:0;it.j=pts;it.ph='done';
+      award(g,pts,{d:0,big:pts===200?'Nailed it!':null,miss:!pts,aww:!pts})}
+  },
+  view(it){
+    const s=it.s,g=1-s,head=`<h2 class="q">${fill(it.p,s)}</h2>${meta('200 pts')}`,st=statusOf(it.a);
+    if(it.ph==='ans'){
+      if(it.a[ME]!=null)return{key:Q()+'|ans|wait',status:st,html:card(`${head}${waitBox('🔒','Locked in',`Waiting for ${N(OTHER())}`)}`,1)};
+      const mineQ=ME===s?`Answer for real. ${tag(g)} is guessing what you'll say right now.`:`What will ${tag(s)} say? They're answering right now.`;
+      return{key:Q()+'|ans',status:st,html:card(`${head}<p class="lead center">${mineQ}</p>
+        <div class="inrow"><input id="ans" type="text" maxlength="90" autocomplete="off" placeholder="${ME===s?'Your real answer':'Your guess'}"></div>
+        <div class="row"><button class="btn" id="lock">Lock it in 🔒</button></div>`,1),
+        mount(){const inp=$('#ans');const go=()=>{const v=inp.value.trim();if(!v){shakeEl(inp);return}SFX.lock();act({t:'km_ans',v})};$('#lock').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()}}};
+    }
+    const anim=it.ph==='rev'&&once(Q()+'|rev');
+    return{key:Q()+'|'+it.ph,ready:it.ph==='done'?'Next':'',
+      html:card(`${head}<div class="duo">
+        <div class="flip ${anim?'':'show'}" id="f0"><div class="inner"><div class="face front">?</div><div class="face back b${s}"><div class="who">${N(s)} said</div><div class="ans">${esc(it.a[s])}</div></div></div></div>
+        <div class="flip ${anim?'':'show'}" id="f1"><div class="inner"><div class="face front">?</div><div class="face back b${g}"><div class="who">${N(g)} guessed</div><div class="ans">${esc(it.a[g])}</div></div></div></div></div>
+        <div id="judge"></div><div class="row" id="ctl"></div>`),
+      mount(){if(anim){SFX.drum();setTimeout(()=>{$('#f0')?.classList.add('show');SFX.reveal()},1200);setTimeout(()=>{$('#f1')?.classList.add('show');SFX.reveal()},2000);setTimeout(()=>this.patch(),2600)}else this.patch()},
+      patch(){const j=$('#judge');if(!j)return;
+        if(it.ph==='done'){j.innerHTML=`<p class="lead center">${it.j?`${tag(g)} earns ${it.j}!`:'No points this time.'}</p>`;return}
+        if(performance.now()-T0<2500&&anim)return;
+        j.innerHTML=ME===s?`<p class="lead center">You're the judge. Did ${tag(g)} get it?</p><div class="row"><button class="btn" data-p="200">🎯 Nailed it +200</button><button class="btn ghost" data-p="100">🤏 Close +100</button><button class="btn ghost" data-p="0">❌ Nope</button></div>`
+          :`<p class="lead center dots">${tag(s)} is judging your guess</p>`;
+        j.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>act({t:'km_judge',v:+b.dataset.p}))}};
+  }
+};
+
+/* ---------- 2. Top of the List ---------- */
+ROUNDS.top={
+  start(){G.q={qs:queue(draw('top',G.cfg.top*2)),i:0}},
+  init(it){it.ph='list';it.list=null;it.rev=[];it.strikes=0;it.judging=null;it.msg='';it.done=false;it.hist=[]},
+  act(p,a,it){
+    const s=it.s,g=1-s,pts=TOP_PTS[G.cfg.topN];
+    const hit=(k,msg)=>{it.rev[k]=true;award(g,pts[k],{d:0});ev('hit',{k});it.msg=`${msg} +${pts[k]}`;
+      if(it.rev.every(Boolean)){award(g,100,{d:700,big:'Board cleared!'});it.msg='Board cleared! +100 bonus';it.ph='done'}};
+    if(a.t==='top_list'&&p===s&&it.ph==='list'){it.list=a.v.slice(0,G.cfg.topN).map(x=>String(x).slice(0,40));it.rev=it.list.map(()=>false);it.ph='board';it.msg=`${G.names[g]}, start guessing!`}
+    if(a.t==='top_guess'&&p===g&&it.ph==='board'&&!it.judging){
+      const v=String(a.v).slice(0,40);it.hist.push(v);
+      const open=it.list.findIndex((x,k)=>!it.rev[k]&&fuzzy(v,x));if(open>=0){hit(open,`"${v}" is on the board!`);return}
+      if(it.list.some((x,k)=>it.rev[k]&&fuzzy(v,x))){it.msg=`"${v}" is already up there`;ev('dup');return}
+      it.judging=v;it.msg=`"${v}"... ${G.names[s]} is deciding`;ev('judge');
+    }
+    if(a.t==='top_judge'&&p===s&&it.judging){const v=it.judging;it.judging=null;
+      if(a.k>=0&&!it.rev[a.k])hit(a.k,`${G.names[s]} says "${v}" counts!`);
+      else{it.strikes++;ev('strike',{n:it.strikes});it.msg=`Strike ${it.strikes}! "${v}" isn't on the list`;if(it.strikes>=3){it.ph='done';award(g,0,{d:0,miss:1})}}}
+    if(a.t==='top_give'&&p===g&&it.ph==='board'){it.ph='done';it.msg='Here\'s the rest of the list'}
+  },
+  view(it){
+    const s=it.s,g=1-s,n=G.cfg.topN,pts=TOP_PTS[n],head=`<h2 class="q">${fill(it.p,s)}</h2>${meta('Top '+n)}`;
+    if(it.ph==='list'){
+      if(ME===g)return{key:Q()+'|list|g',status:['',''].map((_,i)=>i===s?'writing…':''),html:card(`${head}${waitBox('✍️',`${N(s)} is writing their top ${n}`,'Start thinking about what they\'ll put. You\'ll guess next.')}`,1)};
+      return{key:Q()+'|list|s',status:['',''].map((_,i)=>i===s?'writing…':''),html:card(`${head}<p class="lead center">List your top ${n}, #1 being your favorite. ${tag(g)} will try to guess them.</p>
+        <div class="listin">${Array.from({length:n},(_,k)=>`<label><span class="rk">${k+1}</span><input type="text" class="li" maxlength="40" autocomplete="off" placeholder="#${k+1}"></label>`).join('')}</div>
+        <div class="row"><button class="btn" id="lock">Lock in my list 🔒</button></div>`,1),
+        mount(){const ins=[...stage.querySelectorAll('.li')];
+          const go=()=>{const e=ins.filter(x=>!x.value.trim());if(e.length){e.forEach(shakeEl);e[0].focus();return}SFX.lock();act({t:'top_list',v:ins.map(x=>x.value.trim())})};
+          ins.forEach((x,k)=>x.onkeydown=e=>{if(e.key==='Enter'){if(k<ins.length-1)ins[k+1].focus();else go()}});$('#lock').onclick=go}};
+    }
+    const done=it.ph==='done';
+    return{key:Q()+'|board',ready:done?'Next':'',readyAt:0,turn:it.judging?s:g,
+      html:card(`${head}
+        <div class="fboard">${it.list.map((x,k)=>`<div class="tile ${it.rev[k]?'show':''}" id="t${k}"><div class="inner">
+          <div class="tf ${ME===s?'hasmine':''}"><span class="num">${k+1}</span>${ME===s?`<span class="mine">${esc(x)}</span>`:''}</div>
+          <div class="tb"><span class="txt">${esc(x)}</span><span class="tp">${pts[k]}</span></div></div></div>`).join('')}</div>
+        <div class="strikes" id="strikes">${'<span>✕</span>'.repeat(3)}</div>
+        <div class="status" id="status"></div>
+        ${ME===g?`<div id="guessarea"><div class="inrow"><input id="gs" type="text" maxlength="40" autocomplete="off" placeholder="Your guess"><button class="btn" id="gbtn">Guess</button></div>
+          <div class="row" style="margin-top:10px"><button class="btn ghost small" id="giveup">Give up</button></div></div>`:''}
+        <div id="judgebox"></div><div class="row" id="ctl"></div>`),
+      mount(){
+        if(ME===g){const inp=$('#gs');const go=()=>{const v=inp.value.trim();if(!v){shakeEl(inp);return}inp.value='';act({t:'top_guess',v})};
+          $('#gbtn').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()};$('#giveup').onclick=()=>act({t:'top_give'})}
+        this.patch()},
+      patch(){
+        it.list.forEach((_,k)=>{const t=$('#t'+k);if(!t)return;if(it.rev[k])t.classList.add('show');else if(done&&!t.classList.contains('show')&&!t.dataset.m){t.dataset.m=1;setTimeout(()=>{t.classList.add('missed','show');SFX.reveal()},400+k*350)}});
+        [...$('#strikes').children].forEach((el,k)=>el.classList.toggle('on',k<it.strikes));
+        $('#status').innerHTML=esc(it.msg);
+        const ga=$('#guessarea');if(ga){ga.style.display=done?'none':'';['#gs','#gbtn','#giveup'].forEach(x=>{const e=$(x);if(e)e.disabled=!!it.judging})}
+        const jb=$('#judgebox');
+        if(ME===s&&it.judging){const h=`<div class="judgebox">${tag(g)} guessed <b>"${esc(it.judging)}"</b>. Does it count?
+          <div class="row">${it.list.map((x,k)=>it.rev[k]?'':`<button class="btn ghost" data-k="${k}">#${k+1} ${esc(x)}</button>`).join('')}<button class="btn red" data-k="-1">✕ Nope</button></div></div>`;
+          if(jb.dataset.h!==h){jb.innerHTML=h;jb.dataset.h=h;jb.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>act({t:'top_judge',k:+b.dataset.k}))}}
+        else{jb.innerHTML='';jb.dataset.h=''}
+      }};
+  }
+};
+
+/* ---------- 3. Pick Three ---------- */
+ROUNDS.p3={
+  start(){G.q={qs:queue(draw('p3',G.cfg.p3*2)),i:0}},
+  init(it){it.ph='pick';it.real=null;it.lineup=null;it.guess=null},
+  act(p,a,it){
+    const s=it.s,g=1-s;
+    if(a.t==='p3_pick'&&p===s&&it.ph==='pick'){const v=a.v.slice(0,3).map(x=>String(x).slice(0,32));it.real=v;
+      const decoys=shuffle(it.p[1].filter(o=>!v.some(x=>x.toLowerCase()===o.toLowerCase()))).slice(0,9);it.lineup=shuffle(v.concat(decoys));it.ph='guess';ev('lock',{p})}
+    if(a.t==='p3_guess'&&p===g&&it.ph==='guess'){it.guess=a.v.slice(0,3);it.ph='rev';let found=0;
+      for(let k=0;k<3;k++){const j=it.guess.indexOf(it.real[k]);if(j>=0){found++;award(g,P3PTS[k]+(j===k?50:0),{at:1300+k*1100+450})}}
+      const perfect=it.guess.every((t,j)=>it.real[j]===t);
+      if(perfect)award(g,0,{at:1300+3*1100+600,big:'Perfect read!'});else if(!found)award(g,0,{at:1300+3*1100+600,miss:1,aww:1})}
+  },
+  view(it){
+    const s=it.s,g=1-s,head=`<h2 class="q">${tag(s)}'s top 3 <span class="hl">${esc(it.p[0])}</span></h2>${meta('Up to 475')}`;
+    if(it.ph==='pick'){
+      if(ME===g)return{key:Q()+'|pick|g',html:card(`${head}${waitBox('🥇',`${N(s)} is picking their top 3`,'Their picks get hidden in a lineup. You find them next.')}`,1)};
+      return{key:Q()+'|pick|s',html:card(`${head}<p class="lead center">Tap your 3 favorites in order. Not listed? Write your own.</p><div id="p3"></div>
+        <div class="row"><button class="btn" id="lock">Lock in my top 3 🔒</button></div>`,1),
+        mount(){const get=p3Mount($('#p3'),it.p[1].slice(),s,true);$('#lock').onclick=()=>{const v=get();if(!v){shakeEl($('#p3s'));return}SFX.lock();act({t:'p3_pick',v})}}};
+    }
+    if(it.ph==='guess'){
+      if(ME===s)return{key:Q()+'|guess|s',html:card(`${head}${waitBox('🔎',`${N(g)} is hunting for your picks`)}<div class="mine-note">Your picks: ${it.real.map((t,k)=>`${MED[k]} <b>${esc(t)}</b>`).join(' &nbsp; ')}</div>`,1)};
+      return{key:Q()+'|guess|g',html:card(`${head}<p class="lead center">${tag(s)}'s top 3 are hiding in here. Tap their #1, #2 and #3 in order.</p><div id="p3"></div>
+        <div class="row"><button class="btn" id="lock">Final answer</button></div>`,1),
+        mount(){const get=p3Mount($('#p3'),it.lineup.slice(),g,false);$('#lock').onclick=()=>{const v=get();if(!v){shakeEl($('#p3s'));return}act({t:'p3_guess',v})}}};
+    }
+    const anim=once(Q()+'|rev');
+    return{key:Q()+'|rev',ready:'Next',readyAt:anim?1300+3*1100+800:0,html:card(`${head}<div class="p3rev">
+        <div class="p3lab">${tag(s)}'s real top 3</div>
+        <div class="p3row">${it.real.map((t,k)=>`<div class="p3card hidden" id="pr${k}"><span class="medal">${MED[k]}</span><span class="t">${esc(t)}</span></div>`).join('')}</div>
+        <div class="p3lab">${tag(g)}'s guesses</div>
+        <div class="p3row">${it.guess.map((t,k)=>`<div class="p3card" id="pg${k}"><span class="medal">${MED[k]}</span><span class="t">${esc(t)}</span><span class="chip2"></span></div>`).join('')}</div>
+        <div class="chips" id="lineup" style="opacity:0;transition:opacity .6s">${it.lineup.map(t=>{const r=it.real.indexOf(t),gi=it.guess.indexOf(t);return `<span class="chip ${r>=0?'real':gi>=0?'wrong':'dim'}">${r>=0?MED[r]:''}${esc(t)}</span>`}).join('')}</div>
+      </div><div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+      mount(){const sp=anim?1:0;if(anim)SFX.drum();let total=0,found=0;
+        for(let k=0;k<3;k++)setTimeout(()=>{const pr=$('#pr'+k);if(!pr)return;pr.classList.remove('hidden');pr.classList.add('flipin');if(sp)SFX.reveal();
+          const j=it.guess.indexOf(it.real[k]);setTimeout(()=>{if(j<0){pr.classList.add('miss');return}const p=P3PTS[k]+(j===k?50:0),pg=$('#pg'+j);
+            pg.classList.add(j===k?'exact':'hit');pg.querySelector('.chip2').textContent='+'+p+(j===k?' exact':'');pr.classList.add(j===k?'exact':'hit');found++;total+=p;if(sp){j===k?SFX.ding():SFX.right()}},sp?450:0)},sp?1300+k*1100:0);
+        setTimeout(()=>{it.guess.forEach((t,j)=>{if(!it.real.includes(t)){const pg=$('#pg'+j);pg.classList.add('miss');pg.querySelector('.chip2').textContent='✕'}});
+          $('#lineup').style.opacity=1;$('#verdict').innerHTML=`<div class="big ${found===3?'goldc':found?'good':'badc'}">${found===3?'All three!':found===2?'Two out of three!':found===1?'Got one!':'Swing and a miss'}</div><div class="lead">${tag(g)} earns <b>${total}</b>.</div>`},sp?1300+3*1100+600:30)}};
+  }
+};
+
+/* ---------- 4. Rank It (simultaneous) ---------- */
+ROUNDS.rk={
+  start(){G.q={qs:queue(draw('rk',G.cfg.rk*2)),i:0}},
+  init(it){it.ph='rank';it.o=[null,null]},
+  act(p,a,it){
+    if(a.t==='rk_lock'&&it.ph==='rank'&&it.o[p]==null){it.o[p]=a.v;ev('lock',{p});
+      if(it.o[0]&&it.o[1]){it.ph='rev';const s=it.s,g=1-s,act_=it.o[s],gu=it.o[g],n=act_.length;let tot=0;
+        act_.forEach((t,k)=>{const off=Math.abs(gu.indexOf(t)-k),p2=off===0?60:off===1?20:0;tot+=p2;if(p2)award(g,p2,{at:1300+k*900+350})});
+        if(act_.every((t,k)=>gu[k]===t))award(g,100,{at:1300+n*900+500,big:'Perfect match!'});else if(!tot)award(g,0,{at:1300+n*900+500,miss:1,aww:1})}}
+  },
+  view(it){
+    const s=it.s,g=1-s,items=it.p[1],n=items.length,head=`<h2 class="q">Rank these <span class="hl">${esc(it.p[0])}</span> from ${tag(s)}'s favorite to least favorite</h2>${meta('Up to '+(n*60+100))}`,st=statusOf(it.o,'✓ locked','ranking…');
+    if(it.ph==='rank'){
+      if(it.o[ME])return{key:Q()+'|wait',status:st,html:card(`${head}${waitBox('🔒','Locked in',`Waiting for ${N(OTHER())}`)}`,1)};
+      return{key:Q()+'|rank',status:st,html:card(`${head}<div class="who-tag center-row">${ME===s?'Your real order':`Your guess at ${N(s)}'s order`}</div>${rkBoard(shuffle(items))}
+        <div class="row"><button class="btn" id="lock">${ME===s?'Lock in my order':'Lock in my guess'} 🔒</button></div>`,1),
+        mount(){const get=rkDrag($('#rk'));$('#lock').onclick=()=>{SFX.lock();act({t:'rk_lock',v:get()})}}};
+    }
+    const anim=once(Q()+'|rev'),emo=new Map(items.map(([e,t])=>[t,e])),A=it.o[s],GU=it.o[g];
+    const tile=(t,k,cls,id,extra='')=>`<div class="rr ${cls}" id="${id}"><span class="rr-n">${k+1}</span><span class="rk-emo">${emo.get(t)}</span><span class="rr-t">${esc(t)}</span>${extra}</div>`;
+    return{key:Q()+'|rev',ready:'Next',readyAt:anim?1300+n*900+700:0,html:card(`${head}
+      <div class="rr-wrap"><div class="rr-h c${s}">${N(s)}'s real order</div><div></div><div class="rr-h c${g}">${N(g)}'s guess</div>
+        <div class="rr-body" id="rrb"><div class="rr-col">${A.map((t,k)=>`<div class="rr-flip" id="ra${k}"><div class="rr-in"><div class="rr hidden"><span class="rr-n">${k+1}</span><span class="rr-t">?</span></div>${tile(t,k,'back','rab'+k)}</div></div>`).join('')}</div>
+          <div></div><div class="rr-col">${GU.map((t,k)=>tile(t,k,'','rg'+k,'<span class="chip"></span>')).join('')}</div><svg class="rr-svg" id="rrsvg"></svg></div></div>
+      <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+      mount(){const lines=[];
+        const drawL=()=>{const b=$('#rrb'),svg=$('#rrsvg');if(!b)return;const br=b.getBoundingClientRect();svg.setAttribute('viewBox',`0 0 ${br.width} ${br.height}`);
+          svg.innerHTML=lines.map(([k,j,c,an])=>{const a=$('#ra'+k).getBoundingClientRect(),q=$('#rg'+j).getBoundingClientRect();
+            const x1=a.right-br.left,y1=a.top+a.height/2-br.top,x2=q.left-br.left,y2=q.top+q.height/2-br.top,mx=(x2-x1)/2;
+            return `<path d="M${x1} ${y1} C${x1+mx} ${y1},${x2-mx} ${y2},${x2} ${y2}" stroke="${c}" class="${an?'grow':''}" pathLength="1"/><circle cx="${x1}" cy="${y1}" r="5" fill="${c}"/><circle cx="${x2}" cy="${y2}" r="5" fill="${c}"/>`}).join('');lines.forEach(l=>l[3]=false)};
+        window._redraw=drawL;if(window.ResizeObserver)new ResizeObserver(()=>drawL()).observe($('#rrb'));
+        if(anim)SFX.drum();let tot=0;
+        A.forEach((t,k)=>setTimeout(()=>{const j=GU.indexOf(t),off=Math.abs(j-k),p=off===0?60:off===1?20:0,cls=off===0?'hit':off===1?'near':'miss',c=off===0?'#2ee59d':off===1?'#ffd23f':'#ff4d4d';
+          $('#ra'+k)?.classList.add('show');$('#rab'+k)?.classList.add(cls);
+          setTimeout(()=>{lines.push([k,j,c,anim]);const gt=$('#rg'+j);if(!gt)return;gt.classList.add(cls);gt.querySelector('.chip').textContent=p?`+${p}`:`${off} off`;tot+=p;requestAnimationFrame(drawL);
+            if(anim){if(p===60)SFX.ding();else if(p)SFX.reveal();else SFX.wrong()}},anim?350:0)},anim?1300+k*900:0));
+        setTimeout(()=>{const perfect=A.every((t,k)=>GU[k]===t);const v=$('#verdict');if(!v)return;tot+=perfect?100:0;
+          v.innerHTML=`<div class="big ${perfect?'goldc':tot>=n*18?'good':'badc'}">${perfect?'Perfect match!':tot>=n*36?'Mind reader!':tot>=n*18?'Pretty close!':tot?'Some work to do':'Total mismatch!'}</div><div class="lead">${tag(g)} earns <b>${tot}</b>.</div>`},anim?1300+n*900+500:60)}};
+  }
+};
+
+/* ---------- 5. Same Page (simultaneous) ---------- */
+ROUNDS.sp={
+  start(){const n=G.cfg.sp,nm=Math.ceil(n/2);const ml=draw('ml',nm).map(p=>({type:'ml',p})),w=draw('wyr',n-nm).map(p=>({type:'wyr',p}));
+    const qs=[];while(ml.length||w.length){if(ml.length)qs.push(ml.shift());if(w.length)qs.push(w.shift())}qs.forEach((q,j)=>q.s=j%2);G.q={qs,i:0}},
+  init(it){it.ph='ans';it.ans=[null,null];it.pred=[null,null]},
+  act(p,a,it){
+    if(a.t==='sp_lock'&&it.ph==='ans'&&it.ans[p]==null){it.ans[p]=a.ans;it.pred[p]=a.pred;ev('lock',{p});
+      if(it.ans[0]!=null&&it.ans[1]!=null){it.ph='rev';
+        if(it.type==='ml'){if(it.ans[0]===it.ans[1]){award(0,100,{at:2600,big:'Same page!'});award(1,100,{at:2600})}else{award(0,0,{at:2600,miss:1,aww:1});award(1,0,{at:2600,miss:1})}}
+        else[0,1].forEach(i=>{const ok=it.pred[i]===it.ans[1-i];if(ok)award(i,100,{at:2100+i*900});else award(i,0,{at:2100+i*900,miss:1})})}}
+  },
+  view(it){
+    const head=`<h2 class="q">${it.type==='ml'?`Who's more likely to ${esc(it.p)}?`:'Would you rather...'}</h2>${meta(it.type==='ml'?"Who's more likely":'Would you rather','alt')}`,st=statusOf(it.ans);
+    if(it.ph==='ans'){
+      if(it.ans[ME]!=null)return{key:Q()+'|wait',status:st,html:card(`${head}${waitBox('🔒','Locked in',`Waiting for ${N(OTHER())}`)}`,1)};
+      const o=OTHER();
+      const body=it.type==='ml'?`<div class="sublabel">Who's more likely?</div><div class="choice" data-g="ans"><button class="ch-btn big n0" data-v="0">${N(0)}</button><button class="ch-btn big n1" data-v="1">${N(1)}</button></div>`
+        :`<div class="sublabel">Your pick</div><div class="choice" data-g="ans"><button class="ch-btn" data-v="0">${esc(it.p[0])}</button><button class="ch-btn" data-v="1">${esc(it.p[1])}</button></div>
+          <div class="sublabel">What will ${tag(o)} pick?</div><div class="choice" data-g="pred"><button class="ch-btn" data-v="0">${esc(it.p[0])}</button><button class="ch-btn" data-v="1">${esc(it.p[1])}</button></div>`;
+      return{key:Q()+'|ans',status:st,html:card(`${head}${body}<div class="row"><button class="btn" id="lock">Lock it in 🔒</button></div>`,1),
+        mount(){stage.querySelectorAll('.choice').forEach(gp=>gp.querySelectorAll('.ch-btn').forEach(b=>b.onclick=()=>{gp.querySelectorAll('.ch-btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');SFX.pop();sparkleAt(b,10)}));
+          $('#lock').onclick=()=>{const gs=[...stage.querySelectorAll('.choice')],miss=gs.filter(x=>!x.querySelector('.sel'));if(miss.length){miss.forEach(shakeEl);return}
+            const val=g=>{const x=stage.querySelector(`.choice[data-g="${g}"] .sel`);return x?+x.dataset.v:null};SFX.lock();act({t:'sp_lock',ans:val('ans'),pred:val('pred')})}}};
+    }
+    const anim=once(Q()+'|rev');
+    if(it.type==='ml'){const same=it.ans[0]===it.ans[1];
+      return{key:Q()+'|rev',ready:'Next',readyAt:anim?2800:0,html:card(`${head}<div class="sp-res">${[0,1].map(i=>`<div class="sp-card v${i} ${anim?'':'in'}" id="sc${i}"><div class="spk">${N(i)} said</div><div class="spv big c${it.ans[i]}">${N(it.ans[i])}</div></div>`).join('')}</div>
+        <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+        mount(){if(anim){SFX.drum();setTimeout(()=>{$('#sc0')?.classList.add('in');SFX.reveal()},1200);setTimeout(()=>{$('#sc1')?.classList.add('in');SFX.reveal()},1900)}
+          setTimeout(()=>{const v=$('#verdict');if(v)v.innerHTML=same?`<div class="big good">Same page!</div><div class="lead">You both picked ${tag(it.ans[0])}. +100 each.</div>`:`<div class="big badc">Not on the same page</div><div class="lead">Discuss.</div>`},anim?2600:0)}};
+    }
+    const opt=v=>esc(it.p[v]);
+    return{key:Q()+'|rev',ready:'Next',readyAt:anim?3800:0,html:card(`${head}<div class="sp-res">${[0,1].map(i=>{const o=1-i,ok=it.pred[i]===it.ans[o];
+        return `<div class="sp-card v${i} ${anim?'':'in'}" id="sc${i}"><div class="spk c${i}">${N(i)} picked</div><div class="spv">${opt(it.ans[i])}</div>
+          <div class="spk">and predicted ${N(o)} would pick</div><div class="spv pred ${ok?'good':'badc'} ${anim?'':'in'}" id="pr${i}">${opt(it.pred[i])} ${ok?'✓':'✕'}</div></div>`}).join('')}</div>
+      <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+      mount(){if(anim){SFX.drum();setTimeout(()=>{$('#sc0')?.classList.add('in');$('#sc1')?.classList.add('in');SFX.reveal()},1200);
+          [0,1].forEach(i=>setTimeout(()=>{$('#pr'+i)?.classList.add('in');it.pred[i]===it.ans[1-i]?SFX.right():SFX.wrong()},2100+i*900))}
+        setTimeout(()=>{const r=[0,1].map(i=>it.pred[i]===it.ans[1-i]),v=$('#verdict');if(!v)return;if(r[0]&&r[1]&&anim){hype('Mind meld!');SFX.applause()}
+          v.innerHTML=r[0]&&r[1]?`<div class="big good">You read each other perfectly!</div>`:r[0]||r[1]?`<div class="big goldc">${tag(r[0]?0:1)} called it!</div>`:`<div class="big badc">Nobody saw that coming</div>`},anim?3800:0)}};
+  }
+};
+
+/* ---------- 6. Fib Detector ---------- */
+ROUNDS.fib={
+  start(){G.q={qs:queue(draw('fib',G.cfg.fib*2)),i:0}},
+  init(it){it.ph='write';it.cards=null;it.pick=null},
+  act(p,a,it){const s=it.s,g=1-s;
+    if(a.t==='fib_write'&&p===s&&it.ph==='write'){it.cards=shuffle(a.v.slice(0,3).map((t,k)=>({t:String(t).slice(0,80),real:k===0})));it.ph='guess';ev('lock',{p})}
+    if(a.t==='fib_pick'&&p===g&&it.ph==='guess'){it.pick=Math.max(0,Math.min(2,+a.k));it.ph='rev';const at=1300+3*900+400;
+      if(it.cards[it.pick].real){award(g,200,{at,big:'Lie detector!'});award(s,0,{at,miss:1})}else{award(s,150,{at,bad:'Fooled you!'});award(g,0,{at,miss:1})}}
+  },
+  view(it){
+    const s=it.s,g=1-s,head=`<h2 class="q">${fill(it.p,s)}</h2>${meta('Truth +200 · Fool +150')}`;
+    if(it.ph==='write'){
+      if(ME===g)return{key:Q()+'|write|g',html:card(`${head}${waitBox('🕵️',`${N(s)} is cooking up two fibs`,'One answer will be true. Get your lie detector ready.')}`,1)};
+      return{key:Q()+'|write|s',html:card(`${head}<p class="lead center">Write the real answer, then two fibs that sound just as believable.</p>
+        <div class="fibin"><label><span class="tg t">Truth</span><input type="text" class="fi" maxlength="80" autocomplete="off" placeholder="The real answer"></label>
+          <label><span class="tg f">Fib #1</span><input type="text" class="fi" maxlength="80" autocomplete="off" placeholder="A believable lie"></label>
+          <label><span class="tg f">Fib #2</span><input type="text" class="fi" maxlength="80" autocomplete="off" placeholder="Another one"></label></div>
+        <div class="hint">Capitalization gets matched automatically so nothing gives it away.</div>
+        <div class="row"><button class="btn" id="lock">Lock them in 🔒</button></div>`,1),
+        mount(){const ins=[...stage.querySelectorAll('.fi')];
+          const go=()=>{const v=ins.map(x=>sentenceCase(x.value));const e=ins.filter((x,k)=>!v[k]);if(e.length){e.forEach(shakeEl);return}
+            if(new Set(v.map(x=>x.toLowerCase())).size<3){ins.forEach(shakeEl);toast('All three need to be different');return}SFX.lock();act({t:'fib_write',v})};
+          ins.forEach((x,k)=>x.onkeydown=e=>{if(e.key==='Enter'){if(k<2)ins[k+1].focus();else go()}});$('#lock').onclick=go}};
+    }
+    if(it.ph==='guess'){
+      if(ME===s){const r=it.cards.findIndex(c=>c.real);return{key:Q()+'|guess|s',html:card(`${head}${waitBox('🤞',`${N(g)} is deciding`)}<div class="mine-note">Your truth is option <b>${'ABC'[r]}</b>. Keep a straight face.</div>
+        <div class="fibs" style="margin-top:12px">${it.cards.map((c,k)=>`<div class="fibcard ${c.real?'sel':''}" style="--c:var(--ok)"><span class="ltr">${'ABC'[k]}</span><span>${esc(c.t)}</span></div>`).join('')}</div>`,1)}}
+      return{key:Q()+'|guess|g',html:card(`${head}<p class="lead center">One of these is true. Which one?</p>
+        <div class="fibs">${it.cards.map((c,k)=>`<button class="fibcard" data-k="${k}" style="--c:var(--p${g})"><span class="ltr">${'ABC'[k]}</span><span>${esc(c.t)}</span><span class="stamp"></span></button>`).join('')}</div>
+        <div class="row"><button class="btn" id="lock">That's the truth</button></div>`,1),
+        mount(){let pk=null;stage.querySelectorAll('.fibcard').forEach(b=>b.onclick=()=>{pk=+b.dataset.k;stage.querySelectorAll('.fibcard').forEach(x=>x.classList.toggle('sel',x===b));SFX.pop()});
+          $('#lock').onclick=()=>{if(pk==null){shakeEl($('.fibs'));return}SFX.lock();act({t:'fib_pick',k:pk})}}};
+    }
+    const anim=once(Q()+'|rev'),right=it.cards[it.pick].real;
+    return{key:Q()+'|rev',ready:'Next',readyAt:anim?1300+3*900+600:0,html:card(`${head}
+      <div class="fibs">${it.cards.map((c,k)=>`<div class="fibcard ${k===it.pick?'sel':''}" id="fc${k}" style="--c:var(--p${g})"><span class="ltr">${'ABC'[k]}</span><span>${esc(c.t)}</span><span class="stamp">${c.real?'TRUTH':'FIB'}</span></div>`).join('')}</div>
+      <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+      mount(){if(anim)SFX.drum();const order=it.cards.map((c,k)=>k).sort((a,b)=>it.cards[a].real-it.cards[b].real);
+        order.forEach((k,n)=>setTimeout(()=>{const c=it.cards[k],el=$('#fc'+k);if(!el)return;el.classList.add(c.real?'istruth':'isfib');if(anim){if(c.real){SFX.cymbal();sparkleAt(el,40,['#2ee59d','#fff'])}else SFX.strike()}},anim?1300+n*900:0));
+        setTimeout(()=>{const v=$('#verdict');if(v)v.innerHTML=right?`<div class="big good">${N(g)} sniffed it out!</div><div class="lead">${tag(g)} gets +200.</div>`:`<div class="big badc">${N(s)} got away with it!</div><div class="lead">${tag(s)} gets +150 for the con.</div>`},anim?1300+3*900+400:0)}};
+  }
+};
+
+/* ---------- 7. The Draft ---------- */
+ROUNDS.dr={
+  start(){G.q={qs:draw('dr',G.cfg.dr).map((p,j)=>({p,s:j%2,first:j%2})),i:0}},
+  init(it){it.partner=it.p[1]==='PARTNER';it.picks=[];it.owner={};it.rank=[null,null];it.grid=shuffle(it.p[2]);it.ph=it.partner?'rank':'board'},
+  act(p,a,it){
+    if(a.t==='dr_rank'&&it.ph==='rank'&&it.rank[p]==null){it.rank[p]=a.v;ev('lock',{p});if(it.rank[0]&&it.rank[1])it.ph='board'}
+    if(a.t==='dr_pick'&&it.ph==='board'){const turn=it.picks.length%2===0?it.first:1-it.first;const t=a.v;
+      if(p!==turn||it.owner[t]!=null||!it.p[2].includes(t))return;it.owner[t]=p;it.picks.push(t);ev('pick',{p,v:t});
+      if(it.picks.length===it.p[2].length){it.ph='rev';
+        if(!it.partner){const items=it.p[2];for(let n=0;n<items.length;n++){const k=items.length-1-n;award(it.owner[items[k]],DPTS(k+1),{at:1200+n*520,quiet:1})}}
+        else{const cols=[0,1].map(i=>drCol(it,i));let n=0;const len=Math.max(cols[0].length,cols[1].length);
+          for(let k=0;k<len;k++)for(let i=0;i<2;i++){if(!cols[i][k])continue;award(i,DPTS(cols[i][k].r),{at:1200+n*500,quiet:1});n++}}}}
+  },
+  view(it){
+    const items=it.p[2],head=`<h2 class="q">${esc(it.p[0])}</h2>${meta(it.partner?'Scored by your partner\'s ranking':esc(it.p[1]),'alt')}`;
+    if(it.ph==='rank'){const st=statusOf(it.rank,'✓ locked','ranking…');
+      if(it.rank[ME])return{key:Q()+'|rk|wait',status:st,html:card(`${head}${waitBox('🔒','Ranking locked',`Waiting for ${N(OTHER())}`)}`,1)};
+      return{key:Q()+'|rk',status:st,html:card(`${head}<p class="lead center">Rank these for real, favorite on top. You'll each score off the other's ranking, so draft what your partner loves.</p>
+        ${rkBoard(shuffle(items).map(t=>['',t]))}<div class="row"><button class="btn" id="lock">Lock in my ranking 🔒</button></div>`,1),
+        mount(){const get=rkDrag($('#rk'));$('#lock').onclick=()=>{SFX.lock();act({t:'dr_rank',v:get()})}}};
+    }
+    if(it.ph==='board'){const turn=it.picks.length%2===0?it.first:1-it.first,mine=turn===ME;
+      return{key:Q()+'|board|'+it.picks.length,turn,status:[turn===0?'picking…':'',turn===1?'picking…':''],scroll:false,html:card(`${head}
+        <div class="turnbar" style="--c:var(--p${turn})"><span class="dot"></span>${mine?'Your pick':`${tag(turn)}'s pick`} <span class="cnt">Pick ${it.picks.length+1} of ${items.length}</span></div>
+        <div class="dgrid">${it.grid.map(t=>{const o=it.owner[t];return `<button class="dcard ${o!=null?'own'+o:''}" data-v="${esc(t)}" ${o!=null||!mine?'disabled':''} style="--c:var(--p${turn})">${esc(t)}${o!=null?`<span class="pk">${esc(G.names[o])} #${it.picks.indexOf(t)+1}</span>`:''}</button>`}).join('')}</div>
+        <div class="hint">${it.partner?'Points come from your partner\'s secret ranking.':'The real ranking stays hidden until every item is drafted.'} ${tag(it.first)} picked first this list.</div>`,it.picks.length===0&&!it.partner),
+        mount(){stage.querySelectorAll('.dcard:not(:disabled)').forEach(b=>b.onclick=()=>{stage.querySelectorAll('.dcard').forEach(x=>x.disabled=true);act({t:'dr_pick',v:b.dataset.v})});if(mine&&it.picks.length)buzz([20,30,20])}};
+    }
+    const anim=once(Q()+'|rev');
+    if(!it.partner){
+      return{key:Q()+'|rev',ready:'Next',readyAt:anim?1200+items.length*520+400:0,html:card(`${head}<div class="dlist">${items.map((t,k)=>{const o=it.owner[t];
+          return `<div class="drow o${o} ${anim?'':'in'}" id="dr${k}"><span class="rn">${k+1}</span><span class="t">${esc(t)}</span><span class="own">${N(o)}</span><span class="pts">+${DPTS(k+1)}</span></div>`}).join('')}</div>
+        <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+        mount(){if(anim){SFX.drum();for(let n=0;n<items.length;n++){const k=items.length-1-n;setTimeout(()=>{$('#dr'+k)?.classList.add('in');k===0?(SFX.cymbal(),flash()):SFX.tick()},1200+n*520)}}
+          setTimeout(()=>drVerdict(it),anim?1200+items.length*520+300:0)}};
+    }
+    const cols=[0,1].map(i=>drCol(it,i));
+    return{key:Q()+'|rev',ready:'Next',readyAt:anim?1200+10*500+400:0,html:card(`${head}<div class="dcols">${[0,1].map(i=>`<div><h3 class="c${i}">${N(i)}'s picks</h3><div class="dlist">${cols[i].map((x,k)=>
+        `<div class="drow o${i} ${anim?'':'in'}" id="d${i}_${k}"><span class="rn">${x.r}</span><span class="t">${esc(x.t)}</span><span class="pts">+${DPTS(x.r)}</span></div>`).join('')}</div><div class="hint">Numbers are ${N(1-i)}'s ranking</div></div>`).join('')}</div>
+      <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+      mount(){let n=0;if(anim){SFX.drum();const len=Math.max(cols[0].length,cols[1].length);for(let k=0;k<len;k++)for(let i=0;i<2;i++){if(!cols[i][k])continue;const x=cols[i][k];setTimeout(()=>{$(`#d${i}_${k}`)?.classList.add('in');x.r===1?SFX.ding():SFX.tick()},1200+n*500);n++}}
+        setTimeout(()=>drVerdict(it),anim?1200+n*500+300:0)}};
+  }
+};
+function drCol(it,i){const o=1-i;return it.picks.filter(t=>it.owner[t]===i).map(t=>({t,r:it.partner?it.rank[o].indexOf(t)+1:it.p[2].indexOf(t)+1})).sort((a,b)=>a.r-b.r)}
+function drVerdict(it){const tot=[0,1].map(i=>drCol(it,i).reduce((s,x)=>s+DPTS(x.r),0)),w=tot[0]===tot[1]?-1:tot[0]>tot[1]?0:1,v=$('#verdict');if(!v)return;
+  v.innerHTML=`<div class="big ${w<0?'goldc':'good'}">${w<0?'Dead even draft!':`${N(w)} wins this list`}</div><div class="lead">${tag(0)} ${tot[0]} · ${tag(1)} ${tot[1]}</div>`;
+  if(w>=0&&!onceSet.has('drh'+Q())&&onceSet.add('drh'+Q())){hype(`${G.names[w]} wins the draft!`);SFX.applause();confetti(80)}}
+
+/* ---------- 8. On a Scale (simultaneous) ---------- */
+ROUNDS.sc={
+  start(){G.q={qs:queue(draw('sc',G.cfg.sc*2)),i:0}},
+  init(it){it.ph='set';it.v=[null,null]},
+  act(p,a,it){
+    if(a.t==='sc_lock'&&it.ph==='set'&&it.v[p]==null){it.v[p]=Math.max(1,Math.min(100,+a.v|0));ev('lock',{p});
+      if(it.v[0]!=null&&it.v[1]!=null){it.ph='rev';const s=it.s,g=1-s,d=Math.abs(it.v[s]-it.v[g]),last=G.q.i===G.q.qs.length-1,m=last?2:1;
+        const base=d<=3?300:d<=10?200:d<=20?100:0;award(g,base*m,{at:3100,big:base===300?'Bullseye!':null,miss:!base,aww:!base})}}
+  },
+  view(it){
+    const s=it.s,g=1-s,last=G.q.i===G.q.qs.length-1,head=`<h2 class="q">${fill(it.p[0],s)}</h2>${meta(last?'Double points':'Up to 300',last?'dbl':'')}`,st=statusOf(it.v,'✓ locked','sliding…');
+    if(it.ph==='set'){
+      if(it.v[ME]!=null)return{key:Q()+'|wait',status:st,html:card(`${head}${waitBox('🔒',`Locked at ${it.v[ME]}`,`Waiting for ${N(OTHER())}`)}`,1)};
+      return{key:Q()+'|set',status:st,html:card(`${head}<p class="lead center">${ME===s?`Be honest. Where do you land? ${tag(g)} is guessing your number right now.`:`Where do you think ${tag(s)} lands? They're setting their number right now.`}</p>
+        ${dialHTML(it,ME)}<div class="row"><button class="btn" id="lock">Lock it in 🔒</button></div>`,1),
+        mount(){const d=wireDial();$('#lock').onclick=()=>{SFX.lock();act({t:'sc_lock',v:+d.value})}}};
+    }
+    const anim=once(Q()+'|rev'),a=it.v[s],gu=it.v[g],dist=Math.abs(a-gu),m=last?2:1;
+    const [base,label,cls]=dist<=3?[300,'Bullseye!','goldc']:dist<=10?[200,'So close!','good']:dist<=20?[100,'Not bad!','good']:[0,'Way off!','badc'];
+    const pos=v=>`${(v-1)/99*100}%`,band=(w,c)=>{const lo=Math.max(1,a-w),hi=Math.min(100,a+w);return `<div class="band ${c}" style="left:${pos(lo)};width:calc(${pos(hi)} - ${pos(lo)})"></div>`};
+    return{key:Q()+'|rev',ready:'Next',readyAt:anim?3300:0,html:card(`${head}
+      <div class="meter"><div class="track"></div>${band(20,'b20')}${band(10,'b10')}${band(3,'b3')}
+        <div class="mk top ${anim?'hide':''}" id="mA" style="left:${anim?'0%':pos(a)}"><span class="lbl c${s}">${N(s)}</span><span class="val c${s}" id="mAv">${anim?1:a}</span><span class="stem" style="background:var(--p${s})"></span></div>
+        <div class="mk bot" style="left:${pos(gu)}"><span class="lbl c${g}">${N(g)}'s guess</span><span class="val c${g}">${gu}</span><span class="stem" style="background:var(--p${g})"></span></div></div>
+      <div class="ticks"><span>1</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+      <div class="ends" style="margin:4px 8px 0"><div>${esc(it.p[1])}</div><div>${esc(it.p[2])}</div></div>
+      <div class="verdict" id="verdict"></div><div class="row" id="ctl"></div>`),
+      mount(){if(anim){SFX.drum();setTimeout(()=>{const mk=$('#mA');if(!mk)return;mk.classList.remove('hide');void mk.offsetWidth;mk.style.left=pos(a);SFX.slide();const el=$('#mAv'),t0=performance.now();
+          const f=n=>{const k=Math.min(1,(n-t0)/1600);if(el)el.textContent=Math.round(1+(a-1)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)},1300)}
+        setTimeout(()=>{stage.querySelectorAll('.band').forEach(b=>b.classList.add('on'));const v=$('#verdict');if(v)v.innerHTML=`<div class="big ${cls}">${label}</div><div class="lead">${N(s)} said <b>${a}</b>, ${N(g)} guessed <b>${gu}</b>. Off by ${dist}. ${base?`${tag(g)} gets +${base*m}${m>1?' (doubled)':''}`:'No points.'}</div>`;if(base&&base<300&&anim)SFX.right()},anim?3100:0)}};
+  }
+};
+
+/* =====================================================================
+   BOOT
+   ===================================================================== */
+function bulbs(){const pl=$('#plate');pl.querySelectorAll('.bulb').forEach(b=>b.remove());const w=pl.offsetWidth,h=pl.offsetHeight,inset=8,gap=22;const pts=[];
+  const nx=Math.max(2,Math.round((w-2*inset)/gap)),ny=Math.max(1,Math.round((h-2*inset)/gap));
+  for(let k=0;k<=nx;k++)pts.push([inset+k*(w-2*inset)/nx,inset]);for(let k=1;k<=ny;k++)pts.push([w-inset,inset+k*(h-2*inset)/ny]);
+  for(let k=nx-1;k>=0;k--)pts.push([inset+k*(w-2*inset)/nx,h-inset]);for(let k=ny-1;k>=1;k--)pts.push([inset,inset+k*(h-2*inset)/ny]);
+  pts.forEach(([x,y],i)=>{const b=document.createElement('span');b.className='bulb';b.style.left=x+'px';b.style.top=y+'px';b.style.animationDelay=(-(i%8)*.2)+'s';pl.appendChild(b)})}
+function syncCtrls(){$('#snd').classList.toggle('off',!PREF.sound);$('#snd').textContent=PREF.sound?'🔊':'🔇';$('#mic').classList.toggle('off',!PREF.voice)}
+$('#snd').onclick=()=>{PREF.sound=PREF.sound?0:1;savePref();syncCtrls()};
+$('#mic').onclick=()=>{PREF.voice=PREF.voice?0:1;savePref();syncCtrls();if(PREF.voice)speak('Announcer on');else try{speechSynthesis.cancel()}catch(e){}};
+$('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+let wake=null;async function keepAwake(){try{if('wakeLock' in navigator&&document.visibilityState==='visible')wake=await navigator.wakeLock.request('screen')}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){keepAwake();if(ROLE==='guest'&&!LOCAL&&!netOK)setTimeout(dial,300)}});
+addEventListener('pointerdown',keepAwake,{once:true});
+addEventListener('resize',()=>{bulbs();sizeFx();seedAmb()});
+sizeFx();seedAmb();requestAnimationFrame(ambLoop);bulbs();syncCtrls();renderLanding();
+</script>
+</body>
+</html>
