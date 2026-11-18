@@ -1150,7 +1150,7 @@ function handle(p,a){
     case 'ready':G.rdy[p]=1;if(G.rdy[0]&&G.rdy[1])advance();return;
     case 'reroll':{
       if(!it||!rerollable(it))return;G.vote[p]=G.vote[p]?0:1;
-      if(G.vote[0]&&G.vote[1]){const bank=rid()==='sp'?it.type:rid();it.p=pickNew(bank,it.p);ROUNDS[rid()].init(it);G.vote=[0,0];ev('reroll')}
+      if(G.vote[0]&&G.vote[1]){const bank=rid()==='sp'?it.type:rid();it.p=pickNew(bank,it.p);it.rr=(it.rr||0)+1;ROUNDS[rid()].init(it);G.vote=[0,0];ev('reroll')}
       return}
     default:if(G.stage==='play'&&it)ROUNDS[rid()].act(p,a,it);
   }
@@ -1624,7 +1624,7 @@ function fuzzy(g,a){const x=norm(g),y=norm(a);if(!x||!y)return false;if(x===y||x
    ROUNDS (host runs start/init/act, both phones run view)
    ===================================================================== */
 const ROUNDS={};
-const Q=()=>`${G.game}|${G.ri}|${G.q.i}`;
+const Q=()=>`${G.game}|${G.ri}|${G.q.i}|r${(cur()||{}).rr||0}`;
 
 /* ---------- 1. Know Me Best (simultaneous) ---------- */
 ROUNDS.km={
